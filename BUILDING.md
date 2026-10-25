@@ -1,177 +1,43 @@
-# Prerequisites
+# Building Tafel
 
-First install git, clone the repository and init its submodules:
+> Tafel is a modified fork of [Rnote](https://github.com/flxzt/rnote).
+> This file is adapted from Rnote's [BUILDING.md](https://github.com/flxzt/rnote/blob/main/BUILDING.md).
+
+Tafel keeps Rnote's code layout. The crates keep their upstream names (`rnote`, `rnote-engine`, `rnote-cli`, ...).
+The app itself is renamed:
+
+| | Value |
+|---|---|
+| Binary | `tafel` (built from the `rnote` package in `crates/rnote-ui`) |
+| App ID | `io.github.ansgomez.tafel` (`io.github.ansgomez.tafel.Devel` with the devel profile) |
+| Resource path | `/io/github/ansgomez/tafel/` |
+| CLI binary | `rnote-cli` (unchanged) |
+
+The supported and tested path is a **native meson build on Fedora 44**.
+
+# Get the source
 
 ```bash
 sudo dnf install git
-git clone https://github.com/flxzt/rnote
-cd rnote
-git submodule update --init --recursive
+git clone https://github.com/ansgomez/tafel
+cd tafel
 ```
 
-# Nightlies
+The repository has no git submodules, so no `git submodule` step is needed.
 
-If you just want to test the latest build,
-you can download the latest nightly flatpak (actually currently a weekly build) built from the `nightly` CI workflow.
-Go to:
-
-https://github.com/flxzt/rnote/actions/workflows/nightly.yml
-
-Click on the most recent workflow run and navigate to the bottom.
-There is a link to the nightly flatpak artifact which you can download.
-Unzip, then install and run the nightly with:
-
-```bash
-flatpak install --user com.github.flxzt.rnote.Devel.flatpak
-flatpak run com.github.flxzt.rnote.Devel
-```
-
-# Just Recipes
-
-Most of the commands and steps mentioned here are available as just recipes.
-First install the `just` command-runner.
-To get a list of available recipes execute:
-
-```bash
-just --list
-```
-
-and invoke recipes with:
-
-```bash
-just <recipe-name>
-```
-
-# Building with Flatpak vs Meson
-
-This project can be compiled in two different ways depending on your needs: flatpak or meson.
-
-Flatpak is a sandboxed environment/distribution used for building and running applications in a way
-that is more user friendly and cross platform.
-When using flatpak to build an application, flatpak creates a sandboxed environment tailored to exactly what the
-application needs.
-This makes it much easier to compile and run an application without issues.
-
-Meson is the build system that Rnote uses for building the application.
-It is called when the flatpak is built.
-It is also possible to use meson directly on the host.
-Because it is building on the host machine, it may require more upfront work managing the host environment,
-but then compiling changes to the codebase can be much faster since it does not require rebuilding a sandboxed
-environment.
-
-# Building with Flatpak
-
-There is a flatpak manifest in `build-aux/com.github.flxzt.rnote.Devel.yaml`.
-
-Make sure you have `flatpak` and `flatpak-builder` installed on your system.
-
-
-For Fedora:
-```bash
-sudo dnf install flatpak flatpak-builder
-```
-
-Flathub needs to be added as remote repository:
-
-```bash
-flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-```
-
-The flatpak Gnome runtime, SDK and some extensions are needed:
-
-```bash
-flatpak install org.gnome.Platform//50 org.gnome.Sdk//50 org.freedesktop.Sdk.Extension.rust-stable//25.08
-```
-
-Use Gnome Builder or VSCode with the
-[flatpak extension](https://marketplace.visualstudio.com/items?itemName=bilelmoussaoui.flatpak-vscode)
-to build and run the application for you.
-**This is the easiest and recommended way.**
-
-## Bugs and workarounds
-
-- If you encounter
-    `bwrap: Can't find source path /run/user/1000/doc/by-app/com.github.flxzt.rnote: No such file or directory` when
-    trying to run the flatpak, `xdg-document-portal` did not start yet.
-    Starting it manually with `systemctl start --user xdg-document-portal` should fix it.
-- As long as the flatpak is not installed on the system, The DirectoryList in the workspace browser does not update when
-    files are created, removed or changed.
-    It will work in the released flatpak.
-- Building the flatpak aborts randomly with `status 137 out of memory`:
-    Reset the flatpak App-ID permissions by executing `flatpak permission-reset com.github.flxzt.rnote`,
-    so the build is able to run in the background.
-    see: [upstream issue](https://github.com/flatpak/xdg-desktop-portal/issues/478)
-
-## Manual flatpak build
-
-If you don't have an IDE or extension to handle building flatpaks, you can also do it manually.
-
-### Build
-
-Build and create a local flatpak app repo:
-
-```bash
-flatpak-builder --user --repo=_flatpak_repo _flatpak_app build-aux/com.github.flxzt.rnote.Devel.yaml
-```
-
-You might have to pass the `--force-clean` flag as well to clean previous builds.
-
-### Install
-
-Install to the system as user with:
-
-```bash
-flatpak-builder --user --install _flatpak_app build-aux/com.github.flxzt.rnote.Devel.yaml
-```
-
-### Run
-
-Then it can be run. From the build directory:
-
-```bash
-flatpak-builder --run _flatpak_app build-aux/com.github.flxzt.rnote.Devel.yaml rnote
-```
-
-Or if it is installed:
-
-```bash
-flatpak run com.github.flxzt.rnote
-```
-
-### Bundle
-
-Alternatively after building and creating the local repo you can also create a single-file `.flatpak` bundle:
-
-```bash
-flatpak build-bundle \
-    _flatpak_repo \
-    com.github.flxzt.rnote.Devel.flatpak \
-    com.github.flxzt.rnote.Devel \
-    --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
-```
-
-And install with:
-
-```bash
-flatpak install com.github.flxzt.rnote.Devel.flatpak
-```
-
-# Build with Meson
-
-The flatpak manifest calls the meson build system to build the application.
-If a native build on the host is wanted, meson can be called directly.
+# Build with meson
 
 ## Prerequisites
 
-Install all needed dependencies and build tools, e.g. for Fedora:
+Install the build tools and libraries. For Fedora:
 
 ```bash
 sudo dnf install \
-    gcc gcc-c++ clang clang-devel python3 make cmake meson just git appstream gettext desktop-file-utils \
-    shared-mime-info kernel-devel gtk4-devel libadwaita-devel alsa-lib-devel appstream-devel
+    gcc gcc-c++ clang clang-devel python3 make cmake meson git appstream gettext desktop-file-utils \
+    shared-mime-info gtk4-devel libadwaita-devel alsa-lib-devel appstream-devel
 ```
 
-For Debian based distros:
+For Debian based distros (not tested for Tafel):
 
 ```bash
 sudo apt install \
@@ -179,85 +45,101 @@ sudo apt install \
     shared-mime-info libgtk-4-dev libadwaita-1-dev libasound2-dev libappstream-dev
 ```
 
-Also make sure `rustc` and `cargo` are installed (see [https://www.rust-lang.org/](https://www.rust-lang.org/)).
-Then run:
+Install Rust with [rustup](https://rustup.rs/).
+The minimum Rust version is set by `rust-version` in the root `Cargo.toml` (currently 1.89).
+
+## Set up, compile and install
+
+Install to your user prefix. This needs no root access:
 
 ```bash
-meson setup --prefix=/usr _mesonbuild
+meson setup --prefix="$HOME/.local" -Dcli=false _mesonbuild
+meson compile -C _mesonbuild
+meson install -C _mesonbuild
 ```
-Meson will ask for the user password when needed.
+
+`-Dcli=false` skips `rnote-cli` and the `.rnote` thumbnailer. Leave it out if you want them, but
+they then replace the copies of an Rnote install in the same prefix.
+
+After install, Tafel shows up in the app menu under **Education**.
+The desktop entry uses an absolute `Exec` path (`<prefix>/bin/tafel`),
+because `~/.local/bin` is often not in the GNOME session `PATH`.
+
+To install system-wide instead, use the `/usr` prefix and run the install step with `sudo`:
+
+```bash
+meson setup --prefix=/usr -Dcli=false _mesonbuild
+meson compile -C _mesonbuild
+sudo meson install -C _mesonbuild
+```
+
+The compiled binary is at `_mesonbuild/target/release/tafel`
+(or `_mesonbuild/target/debug/tafel` with the devel profile).
 
 ## Configure
 
-To enable the development profile, set `-Dprofile=devel` as a parameter in the setup.
-Else the `default` profile will be set.
+- Set `-Dprofile=devel` to use the development profile (debug build, app ID `io.github.ansgomez.tafel.Devel`).
+  The default profile is `default`.
+- The `rnote-cli` binary is built by default. Set `-Dcli=false` to skip it.
 
-To enable building the `rnote-cli` binary, set `-Dcli=true`.
-
-## Reconfigure
-
-Reconfiguring the meson build options can be done with:
+Change options on an existing build directory with:
 
 ```bash
 meson configure -D<option>=<value> _mesonbuild
 ```
 
-For example if the profile needs to be changed.
-## Compile
-Once the project is configured, it can be compiled with:
+## Faster local builds (optional)
+
+Release builds use full LTO and are slow. For local work you can override the release profile
+in an untracked `.cargo/config.toml` in the repository root:
+
+```toml
+[profile.release]
+lto = "thin"
+codegen-units = 16
+incremental = true
+debug = "line-tables-only"
+```
+
+On a Framework 12 this gives about 6 minutes for a full rebuild and 2 to 2.5 minutes for an incremental one.
+Keep `.cargo/` untracked. Do not commit it.
+
+## Settings
+
+Settings are stored under the gsettings schema `io.github.ansgomez.tafel`.
+
+List them:
 
 ```bash
-meson compile -C _mesonbuild
+gsettings list-recursively io.github.ansgomez.tafel
 ```
 
-The compiled binary should now be here: `./_mesonbuild/target/release/rnote`.
-
-Note that if an older version of rnote has previously been installed, the old `gschema` file,
-which defines the applications settings will still be used.
-This can cause problems, when the schema used by the development version are different from the ones installed locally:
-
-```
-Settings schema 'com.github.flxzt.rnote' does not contain a key named '...'
-```
-
-In this case you can install the new version of rnote to update the `gschema`.
-
-## Install
-
-Installing the binary to the system can be done with:
+Reset them to defaults:
 
 ```bash
-meson install -C _mesonbuild
+gsettings reset-recursively io.github.ansgomez.tafel
 ```
 
-This places the files in the specified prefix and their subpaths. The binary should now be in `/usr/bin`
-and therefore in `PATH`.
-If meson was configured with a different install prefix path than `/usr`,
-then GIO needs to be told where the installed gschema is located.
-This can be done through the `GSETTINGS_SCHEMA_DIR` env variable.
-
-For example to run the application with a custom gschema path:  
-`GSETTINGS_SCHEMA_DIR=<prefix_path>/share/glib-2.0/schemas rnote`
+If you see `Settings schema 'io.github.ansgomez.tafel' does not contain a key named '...'`,
+the installed schema is older than your build. Run `meson install -C _mesonbuild` again to update it.
 
 ## Test
 
-Meson has some tests to validate the desktop, gresources, ... files.
+Run the meson tests. They validate the desktop, metainfo, gresource and similar files:
 
 ```bash
 meson test -v -C _mesonbuild
 ```
 
-## Uninstall
-
-If you don't like rnote, or decided that it's not worth your precious disk space, you can always uninstall it with:
+Run the Rust unit and integration tests (needs `cargo-nextest`, install with `cargo install cargo-nextest`):
 
 ```bash
-sudo -E ninja uninstall -C _mesonbuild
+meson compile cargo-test -C _mesonbuild
 ```
 
-## Custom Targets
+## Custom targets
 
-There are various custom targets available. Use them like this:
+Run a custom target with:
 
 ```bash
 meson compile <custom target> -C _mesonbuild
@@ -265,31 +147,56 @@ meson compile <custom target> -C _mesonbuild
 
 | target | explanation |
 |---|---|
-| rnote-pot | Regenerate the po template file. Provided by `i18n` module. |
-| rnote-update-po | Update the po files from the template. Provided by the `i18n` module. |
-| rnote-gmo | Compile the po files. Provided by the `i18n` module. |
+| tafel-pot | Regenerate the po template file. Provided by the `i18n` module. |
+| tafel-update-po | Update the po files from the template. Provided by the `i18n` module. |
+| tafel-gmo | Compile the po files. Provided by the `i18n` module. |
 | cargo-fmt-check | Check the code formatting |
-| cargo-test | Run all unit and integration tests |
+| cargo-test | Run all unit and integration tests (needs `cargo-nextest`) |
 | cargo-clean | Clean artifacts that cargo has generated |
 | ui-cargo-check | Run cargo check for the ui package |
 | ui-cargo-clippy | Run clippy for the ui package |
-| ui-cargo-doc | Generate docs for the ui package (also checks documentation formatting) |
+| ui-cargo-doc | Generate docs for the ui package |
 | ui-cargo-build | Build the ui |
 | cli-cargo-check | Run cargo check for the cli package |
 | cli-cargo-clippy | Run clippy for the cli package |
-| cli-cargo-doc | Generate docs for the cli package (also checks documentation formatting) |
+| cli-cargo-doc | Generate docs for the cli package |
 | cli-cargo-build | Build the cli |
-| build-installer | Build the installer (only functional on windows-msys2 and when the ui option is enabled) |
+
+## Uninstall
+
+```bash
+ninja -C _mesonbuild uninstall
+```
+
+For a `/usr` install, run it with `sudo -E`.
+Uninstalling does not remove your settings. Reset them first with `gsettings reset-recursively io.github.ansgomez.tafel` if you want a clean slate.
 
 # Debugging
 
-For a native meson build:
-Be sure to configure meson with option `-Dprofile=devel` to have a build that includes debugging symbols.
-Then configure, compile and install the meson project as outlined above. 
+Configure meson with `-Dprofile=devel` to get a build with debug symbols.
+Then set up, compile and install as above.
 
-## With VSCode
+With VSCode, the `CodeLLDB` extension can debug the app from within the editor.
+Open the repository as a workspace and pick "debug ui" in the "Run and Debug" panel.
 
-The `CodeLLDB` extension can be used to debug from within the editor.
-A `.code-workspace` workspace file is provided in the repository root that contains various configurations, tasks, etc..
-Open the repository as workspace and then select "debug ui" in the "Run and Debug" panel to debug with lldb.
-Then it is possible to set breakpoints, inspect variables, and so on while the app is running.
+# Flatpak, Windows, just recipes and nightlies
+
+These paths still use upstream Rnote names and are **not adapted or tested for Tafel**:
+
+- Flatpak manifests: `build-aux/com.github.flxzt.rnote.Devel.json` and `.yaml`
+- Windows installer: Inno Setup script `build-aux/rnote_inno.iss.in`, built with MSYS2 (`build-installer` target)
+- The `justfile` and the nightly CI workflow
+
+They need renaming (app ID, binary name, resource paths) before they work for Tafel.
+Until then, see upstream's [BUILDING.md](https://github.com/flxzt/rnote/blob/main/BUILDING.md) for how they work.
+
+# Keeping up with upstream
+
+The `upstream` remote points to `flxzt/rnote`. To pull in upstream changes:
+
+```bash
+git fetch upstream
+git merge upstream/main
+```
+
+Expect merge conflicts in `crates/rnote-ui`, where most of Tafel's changes live.

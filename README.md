@@ -35,7 +35,7 @@ as a native app for Linux pen tablets such as the Framework 12.
   - pen and highlighter, with 8 colors and 4 sizes each
   - selector: tap, rectangle, or lasso, depending on how you draw
   - laser pointer with a fading comet trail
-  - eraser (whole strokes) and partial eraser, with a round cursor
+  - eraser (whole strokes) and partial eraser, with a cursor that shows the erased area
   - undo, redo, clear page
 - **Blank pages.** Insert a plain, lined, or grid page after the current slide (Ctrl+Shift+B),
   for example for a worked example. Blank pages can be deleted again. The counter shows
@@ -57,7 +57,9 @@ as a native app for Linux pen tablets such as the Framework 12.
 | PDF import | Asks for spacing and width | One page per PDF page, full width |
 | App ID | `com.github.flxzt.rnote` | `io.github.ansgomez.tafel` |
 
-Tafel and Rnote can be installed side by side; they use separate settings.
+Tafel and Rnote can be installed side by side and keep separate settings. Build Tafel with
+`-Dcli=false` (as in the steps below), otherwise it also installs `rnote-cli` and the `.rnote`
+thumbnailer, which replace Rnote's own copies in the same prefix.
 
 ## Install from source
 
@@ -75,7 +77,7 @@ Make sure `rustc` and `cargo` are installed (see [rustup.rs](https://rustup.rs))
 ```bash
 git clone https://github.com/ansgomez/tafel
 cd tafel
-meson setup --prefix="$HOME/.local" _mesonbuild
+meson setup --prefix="$HOME/.local" -Dcli=false _mesonbuild
 meson compile -C _mesonbuild
 meson install -C _mesonbuild
 ```
