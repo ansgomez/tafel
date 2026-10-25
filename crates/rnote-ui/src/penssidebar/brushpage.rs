@@ -16,7 +16,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penssidebar/brushpage.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penssidebar/brushpage.ui")]
     pub(crate) struct RnBrushPage {
         #[template_child]
         pub(crate) brushstyle_solid_toggle: TemplateChild<ToggleButton>,

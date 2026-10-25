@@ -8,7 +8,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/mainheader.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/mainheader.ui")]
     pub(crate) struct RnMainHeader {
         #[template_child]
         pub(crate) headerbar: TemplateChild<adw::HeaderBar>,

@@ -15,7 +15,7 @@ use std::rc::Rc;
 use tracing::{debug, error, trace};
 
 #[derive(Debug, CompositeTemplate)]
-#[template(resource = "/com/github/flxzt/rnote/ui/appwindow.ui")]
+#[template(resource = "/io/github/ansgomez/tafel/ui/appwindow.ui")]
 pub(crate) struct RnAppWindow {
     pub(crate) engine_config: EngineConfigShared,
     pub(crate) document_config_preset: RefCell<DocumentConfig>,

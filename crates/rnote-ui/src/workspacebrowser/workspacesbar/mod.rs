@@ -23,7 +23,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/workspacesbar/workspacesbar.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/workspacesbar/workspacesbar.ui")]
     pub(crate) struct RnWorkspacesBar {
         pub(crate) action_group: gio::SimpleActionGroup,
         pub(crate) workspace_list: RnWorkspaceList,

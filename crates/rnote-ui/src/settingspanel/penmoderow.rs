@@ -14,7 +14,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate, Default)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penmoderow.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penmoderow.ui")]
     pub(crate) struct RnPenModeRow {
         pub(crate) changepenstyle_model: ChangePenStyleListModel,
 

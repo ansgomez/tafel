@@ -12,7 +12,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penssidebar/typewriterpage.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penssidebar/typewriterpage.ui")]
     pub(crate) struct RnTypewriterPage {
         pub(super) prev_picked_font_family: RefCell<Option<pango::FontFamily>>,
 

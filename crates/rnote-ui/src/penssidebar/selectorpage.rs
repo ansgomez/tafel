@@ -9,7 +9,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penssidebar/selectorpage.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penssidebar/selectorpage.ui")]
     pub(crate) struct RnSelectorPage {
         #[template_child]
         pub(crate) selectorstyle_polygon_toggle: TemplateChild<ToggleButton>,

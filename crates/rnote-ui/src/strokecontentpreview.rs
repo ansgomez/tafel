@@ -12,7 +12,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/strokecontentpreview.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/strokecontentpreview.ui")]
     pub(crate) struct RnStrokeContentPreview {
         pub(crate) contents: RefCell<Vec<StrokeContent>>,
         pub(crate) paintable: StrokeContentPaintable,

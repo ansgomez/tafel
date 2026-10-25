@@ -5,7 +5,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/contextmenu.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/contextmenu.ui")]
     pub(crate) struct RnContextMenu {
         #[template_child]
         pub(crate) popover: TemplateChild<PopoverMenu>,

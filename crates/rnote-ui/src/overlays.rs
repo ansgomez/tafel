@@ -15,7 +15,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/overlays.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/overlays.ui")]
     pub(crate) struct RnOverlays {
         pub(crate) progresspulses_active: Cell<usize>,
         pub(crate) progresspulse_id: RefCell<Option<glib::SourceId>>,

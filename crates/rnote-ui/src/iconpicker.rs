@@ -12,7 +12,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/iconpicker.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/iconpicker.ui")]
     pub(crate) struct RnIconPicker {
         pub(crate) list: RefCell<Option<StringList>>,
         pub(crate) selection: RefCell<Option<SingleSelection>>,

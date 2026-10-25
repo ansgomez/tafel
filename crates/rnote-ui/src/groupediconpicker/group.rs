@@ -19,7 +19,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/groupediconpicker/groupediconpickergroup.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/groupediconpicker/groupediconpickergroup.ui")]
     pub(crate) struct RnGroupedIconPickerGroup {
         pub(crate) name: RefCell<String>,
         pub(crate) icons: RefCell<StringList>,

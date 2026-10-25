@@ -30,7 +30,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/settingspanel.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/settingspanel.ui")]
     pub(crate) struct RnSettingsPanel {
         pub(crate) temporary_format: RefCell<Format>,
         pub(crate) app_restart_toast_singleton: RefCell<Option<adw::Toast>>,

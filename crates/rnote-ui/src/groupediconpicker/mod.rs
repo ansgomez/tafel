@@ -17,7 +17,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/groupediconpicker/groupediconpicker.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/groupediconpicker/groupediconpicker.ui")]
     pub(crate) struct RnGroupedIconPicker {
         pub(crate) picked: RefCell<Option<String>>,
 

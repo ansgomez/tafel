@@ -15,7 +15,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/workspacesbar/workspacerow.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/workspacesbar/workspacerow.ui")]
     pub(crate) struct RnWorkspaceRow {
         pub(crate) entry: RefCell<RnWorkspaceListEntry>,
         #[template_child]

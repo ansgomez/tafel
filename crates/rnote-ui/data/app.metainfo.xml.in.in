@@ -6,7 +6,7 @@
   <project_license>GPL-3.0-or-later</project_license>
   <name translatable="no">@APP_NAME_CAPITALIZED@</name>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
-  <summary>Sketch and take handwritten notes</summary>
+  <summary>Annotate PDF slides like MarpX</summary>
 
   <categories>
     <category>Graphics</category>
@@ -19,8 +19,9 @@
 
   <description>
     <p>
-      Rnote is a vector-based drawing app for sketching, handwritten notes and to annotate documents
-      and pictures.
+      Tafel annotates PDF slides with the tools and look of the MarpX annotation mode: one page at
+      a time, pen, highlighter, laser, selector, erasers and blank pages. It is a modified fork of
+      Rnote by Felix Zwettler and contributors.
     </p>
     <p>
       Disclaimer: The file format is still unstable. It might change and break compatibility between

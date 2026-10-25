@@ -10,7 +10,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/canvasmenu.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/canvasmenu.ui")]
     pub(crate) struct RnCanvasMenu {
         #[template_child]
         pub(crate) menubutton: TemplateChild<MenuButton>,

@@ -332,10 +332,10 @@ rnote_ui_gresources_icons_files = files(
     'icons/scalable/actions/zoom-in-symbolic.svg',
     'icons/scalable/actions/zoom-out-symbolic.svg',
     'icons/scalable/actions/zoom-real-width-symbolic.svg',
-    'icons/scalable/apps/rnote-devel.svg',
-    'icons/scalable/apps/rnote.svg',
-    'icons/scalable/mimetypes/application-rnote.svg',
-    'icons/symbolic/apps/rnote-symbolic.svg',
+    'icons/scalable/apps/tafel-devel.svg',
+    'icons/scalable/apps/tafel.svg',
+    'icons/scalable/mimetypes/application-tafel.svg',
+    'icons/symbolic/apps/tafel-symbolic.svg',
 )
 
 rnote_ui_gresources_ui_files = files(

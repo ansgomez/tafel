@@ -26,7 +26,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penssidebar/penssidebar.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penssidebar/penssidebar.ui")]
     pub(crate) struct RnPensSideBar {
         #[template_child]
         pub(crate) sidebar_stack: TemplateChild<Stack>,

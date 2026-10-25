@@ -9,6 +9,10 @@ repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
+[[bin]]
+name = "tafel"
+path = "src/main.rs"
+
 [dependencies]
 rnote-compose = { workspace = true }
 rnote-engine = { workspace = true, features = ["ui"] }

@@ -10,7 +10,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penssidebar/toolspage.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penssidebar/toolspage.ui")]
     pub(crate) struct RnToolsPage {
         #[template_child]
         pub(crate) toolstyle_verticalspace_toggle: TemplateChild<ToggleButton>,

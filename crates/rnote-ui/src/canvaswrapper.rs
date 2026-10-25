@@ -27,7 +27,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/canvaswrapper.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/canvaswrapper.ui")]
     pub(crate) struct RnCanvasWrapper {
         pub(super) connections: RefCell<Connections>,
         pub(crate) canvas_touch_drawing_handler: RefCell<Option<glib::SignalHandlerId>>,

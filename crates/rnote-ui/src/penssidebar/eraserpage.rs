@@ -10,7 +10,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penssidebar/eraserpage.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penssidebar/eraserpage.ui")]
     pub(crate) struct RnEraserPage {
         #[template_child]
         pub(crate) eraserstyle_trash_colliding_strokes_toggle: TemplateChild<ToggleButton>,

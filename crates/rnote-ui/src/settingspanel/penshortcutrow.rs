@@ -15,7 +15,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penshortcutrow.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penshortcutrow.ui")]
     pub(crate) struct RnPenShortcutRow {
         pub(crate) action: RefCell<ShortcutAction>,
         pub(crate) changepenstyle_model: ChangePenStyleListModel,

@@ -25,7 +25,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/workspacebrowser.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/workspacebrowser.ui")]
     pub(crate) struct RnWorkspaceBrowser {
         pub(crate) action_group: gio::SimpleActionGroup,
         pub(crate) dir_list: DirectoryList,

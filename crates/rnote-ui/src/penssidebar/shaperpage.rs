@@ -21,7 +21,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penssidebar/shaperpage.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penssidebar/shaperpage.ui")]
     pub(crate) struct RnShaperPage {
         #[template_child]
         pub(crate) shapebuildertype_menubutton: TemplateChild<MenuButton>,

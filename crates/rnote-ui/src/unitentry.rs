@@ -13,7 +13,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/unitentry.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/unitentry.ui")]
     pub(crate) struct RnUnitEntry {
         pub(crate) value: Cell<f64>,
         pub(crate) unit: Cell<MeasureUnit>,

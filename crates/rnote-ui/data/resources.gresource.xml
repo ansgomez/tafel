@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-    <gresource prefix="/com/github/flxzt/rnote/">
+    <gresource prefix="/io/github/ansgomez/tafel/">
         <file compressed="true" preprocess="xml-stripblanks">ui/dialogs/dialogs.ui</file>
         <file compressed="true" preprocess="xml-stripblanks">ui/dialogs/export.ui</file>
         <file compressed="true" preprocess="xml-stripblanks">ui/dialogs/import.ui</file>
@@ -212,9 +212,9 @@
         <file compressed="true">icons/scalable/actions/zoom-real-width-symbolic.svg</file>
         <file compressed="true">icons/scalable/actions/zoom-in-symbolic.svg</file>
         <file compressed="true">icons/scalable/actions/zoom-out-symbolic.svg</file>
-        <file compressed="true">icons/scalable/apps/rnote-devel.svg</file>
-        <file compressed="true">icons/scalable/apps/rnote.svg</file>
-        <file compressed="true">icons/scalable/mimetypes/application-rnote.svg</file>
-        <file compressed="true">icons/symbolic/apps/rnote-symbolic.svg</file>
+        <file compressed="true">icons/scalable/apps/tafel-devel.svg</file>
+        <file compressed="true">icons/scalable/apps/tafel.svg</file>
+        <file compressed="true">icons/scalable/mimetypes/application-tafel.svg</file>
+        <file compressed="true">icons/symbolic/apps/tafel-symbolic.svg</file>
     </gresource>
 </gresources>

@@ -14,7 +14,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/filerow.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/filerow.ui")]
     pub(crate) struct RnFileRow {
         pub(crate) current_file: RefCell<Option<gio::File>>,
         /// The position in the list.

@@ -20,7 +20,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/strokewidthpicker.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/strokewidthpicker.ui")]
     pub(crate) struct RnStrokeWidthPicker {
         pub(crate) position: Cell<PositionType>,
         pub(crate) stroke_width: Cell<f64>,

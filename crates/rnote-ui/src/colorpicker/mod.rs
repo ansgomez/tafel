@@ -22,7 +22,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/colorpicker.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/colorpicker.ui")]
     pub(crate) struct RnColorPicker {
         pub(crate) stroke_color: RefCell<gdk::RGBA>,
         pub(crate) fill_color: RefCell<gdk::RGBA>,

@@ -16,7 +16,7 @@ mod imp {
     use super::*;
 
     #[derive(Default, Debug, CompositeTemplate)]
-    #[template(resource = "/com/github/flxzt/rnote/ui/penpicker.ui")]
+    #[template(resource = "/io/github/ansgomez/tafel/ui/penpicker.ui")]
     pub(crate) struct RnPenPicker {
         #[template_child]
         pub(crate) toolbox: TemplateChild<Box>,

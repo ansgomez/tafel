@@ -20,14 +20,14 @@ ci = get_option('ci')
 win_build_environment_path = get_option('win-build-environment-path')
 win_installer_name = get_option('win-installer-name')
 
-app_name = 'rnote'
-app_name_capitalized = 'Rnote'
+app_name = 'tafel'
+app_name_capitalized = 'Tafel'
 cli_name = 'rnote-cli'
-base_id = 'com.github.flxzt.' + app_name
-app_website = 'https://rnote.flxzt.net'
-app_repo_url = 'https://github.com/flxzt/rnote'
-app_issues_url = 'https://github.com/flxzt/rnote/issues'
-app_support_url = 'https://github.com/flxzt/rnote/discussions'
+base_id = 'io.github.ansgomez.' + app_name
+app_website = 'https://github.com/ansgomez/tafel'
+app_repo_url = 'https://github.com/ansgomez/tafel'
+app_issues_url = 'https://github.com/ansgomez/tafel/issues'
+app_support_url = 'https://github.com/ansgomez/tafel/issues'
 app_donate_url = 'https://rnote.flxzt.net/#support'
 app_author_name = 'Felix Zwettler'
 app_authors = run_command(
@@ -45,7 +45,7 @@ version_micro = version_array[2].to_int()
 pkgdatadir = datadir / app_name
 iconsdir = datadir / 'icons'
 gettext_package = app_name
-app_idpath = '/com/github/flxzt/' + app_name + '/'
+app_idpath = '/io/github/ansgomez/' + app_name + '/'
 
 if profile == 'devel'
     app_id = base_id + '.' + 'Devel'
