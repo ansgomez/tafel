@@ -732,12 +732,27 @@ impl RnAppWindow {
                 file_imported
             }
             FileType::PdfFile => {
-                let canvas = self
-                    .active_tab_wrapper()
-                    .ok_or_else(|| anyhow::anyhow!("No active tab to import into"))?
-                    .canvas();
-                dialogs::import::dialog_import_pdf_w_prefs(self, &canvas, input_file, target_pos)
-                    .await?
+                // A Pdf becomes the pages of its document, so it goes into the current tab only
+                // when that is still empty, and into a new tab otherwise.
+                let (new_tab, wrapper) = match self.active_tab_wrapper() {
+                    Some(wrapper)
+                        if wrapper.canvas().empty() && wrapper.canvas().output_file().is_none() =>
+                    {
+                        (false, wrapper)
+                    }
+                    _ => (true, self.new_canvas_wrapper()),
+                };
+                let file_imported = dialogs::import::dialog_import_pdf_w_prefs(
+                    self,
+                    &wrapper.canvas(),
+                    input_file,
+                    target_pos,
+                )
+                .await?;
+                if file_imported && new_tab {
+                    self.append_wrapper_new_tab(&wrapper);
+                }
+                file_imported
             }
             FileType::PlaintextFile => {
                 let canvas = self

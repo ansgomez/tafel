@@ -79,11 +79,37 @@ impl BlankPaper {
     }
 
     /// The paper of a stroke, if it is the paper of a blank page.
+    ///
+    /// Paper consists only of the white page area and lines in the paper colors, so a Pdf page
+    /// that happens to use one of the colors is not taken for paper.
     fn of_stroke(stroke: &Stroke) -> Option<Self> {
         let Stroke::VectorImage(image) = stroke else {
             return None;
         };
-        if !image.svg_data.contains(Self::BASE_COLOR) {
+        let svg = image.svg_data.as_str();
+        let attr = |element: &str, name: &str| -> Option<String> {
+            let start = element.find(&format!(" {name}=\""))? + name.len() + 3;
+            let len = element[start..].find('"')?;
+            Some(element[start..start + len].to_string())
+        };
+        let line_colors = [Self::RULE_COLOR, Self::GRID_COLOR, Self::MARGIN_COLOR];
+        let mut elements = svg
+            .split('<')
+            .filter(|e| !e.is_empty() && !e.starts_with('/'));
+        let only_paper = elements.all(|element| {
+            if element.starts_with("svg ") || element.starts_with("g>") || element.starts_with("g ")
+            {
+                true
+            } else if element.starts_with("path ") {
+                let fill = attr(element, "fill");
+                let stroke = attr(element, "stroke");
+                (fill.as_deref() == Some(Self::BASE_COLOR) && stroke.as_deref() == Some("none"))
+                    || stroke.is_some_and(|stroke| line_colors.contains(&stroke.as_str()))
+            } else {
+                false
+            }
+        });
+        if !svg.contains(Self::BASE_COLOR) || !only_paper {
             None
         } else if image.svg_data.contains(Self::RULE_COLOR) {
             Some(Self::Lined)
@@ -165,6 +191,23 @@ impl Engine {
             .unwrap_or_default()
     }
 
+    /// The strokes on a page that start on it, so strokes that only reach into it from the page
+    /// above are not included.
+    fn page_own_keys(&self, page: u32) -> Vec<StrokeKey> {
+        let Some(format_height) = self.format_height() else {
+            return Vec::new();
+        };
+        let page_top = self.document.y + page as f64 * format_height;
+        self.page_keys(page)
+            .into_iter()
+            .filter(|&key| {
+                self.store.get_stroke_ref(key).is_some_and(|stroke| {
+                    stroke.bounds().mins.y >= page_top - Self::PAGE_BORDER_TOLERANCE
+                })
+            })
+            .collect()
+    }
+
     /// Whether the page shows document content (an imported page), or is a blank page.
     fn page_is_content(&self, page: u32) -> bool {
         self.page_keys(page).into_iter().any(|key| {
@@ -238,7 +281,31 @@ impl Engine {
         if !self.doc_single_page() {
             return WidgetFlags::default();
         }
-        let widget_flags = self.doc_resize_to_fit_content();
+        let Some(format_height) = self.format_height() else {
+            return WidgetFlags::default();
+        };
+        // The pages are the PDF pages and the paper of blank pages. Ink that reaches past them
+        // does not add pages. Without such strokes the pages are left as they are.
+        let Some(bottom) = self
+            .store
+            .stroke_keys_unordered()
+            .into_iter()
+            .filter(|&key| self.store.stroke_layer(key) == Some(StrokeLayer::Document))
+            .filter_map(|key| self.store.get_stroke_ref(key).map(|s| s.bounds().maxs.y))
+            .reduce(f64::max)
+        else {
+            return WidgetFlags::default();
+        };
+        let mut widget_flags = WidgetFlags::default();
+        let n_pages = ((bottom - self.document.y) / format_height)
+            .round()
+            .max(1.0);
+        let height = n_pages * format_height;
+        if (self.document.height - height).abs() > Self::PAGE_BORDER_TOLERANCE {
+            self.document.height = height;
+            widget_flags.resize = true;
+            widget_flags |= self.update_rendering_current_viewport();
+        }
         if self.document.shown_page >= self.doc_n_pages() {
             self.document.needs_fit = true;
         }
@@ -402,16 +469,7 @@ impl Engine {
         }
         let page = self.doc_current_page();
         // Strokes that start on the page above and only reach into this page are kept.
-        let page_top = self.document.y + page as f64 * format_height;
-        let on_page = self
-            .page_keys(page)
-            .into_iter()
-            .filter(|&key| {
-                self.store.get_stroke_ref(key).is_some_and(|stroke| {
-                    stroke.bounds().mins.y >= page_top - Self::PAGE_BORDER_TOLERANCE
-                })
-            })
-            .collect::<Vec<StrokeKey>>();
+        let on_page = self.page_own_keys(page);
         self.store.set_trashed_keys(&on_page, true);
 
         let page_bottom = self.document.y + (page + 1) as f64 * format_height;
@@ -436,7 +494,7 @@ impl Engine {
 
     /// Everything written on a page: all strokes except the document content and paper.
     fn page_ink_keys(&self, page: u32) -> Vec<StrokeKey> {
-        self.page_keys(page)
+        self.page_own_keys(page)
             .into_iter()
             .filter(|&key| self.store.stroke_layer(key) != Some(StrokeLayer::Document))
             .collect()
@@ -453,5 +511,33 @@ impl Engine {
         widget_flags |= self.record(Instant::now()) | self.update_rendering_current_viewport();
         widget_flags.store_modified = true;
         widget_flags
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn paper_stroke(svg: &str) -> Stroke {
+        let size = Vector2::new(320.0, 180.0);
+        Stroke::VectorImage(
+            VectorImage::from_svg_str(svg, Vector2::ZERO, ImageSizeOption::ImposeSize(size))
+                .unwrap(),
+        )
+    }
+
+    #[test]
+    fn paper_is_recognized() {
+        let size = Vector2::new(320.0, 180.0);
+        for paper in [BlankPaper::Plain, BlankPaper::Lined, BlankPaper::Grid] {
+            let stroke = paper_stroke(&paper.svg(size));
+            assert_eq!(BlankPaper::of_stroke(&stroke), Some(paper));
+        }
+    }
+
+    #[test]
+    fn page_with_paper_color_and_more_is_not_paper() {
+        let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180"><rect x="0" y="0" width="320" height="180" fill="#fffffe"/><rect x="10" y="10" width="50" height="50" fill="#123456"/></svg>"##;
+        assert_eq!(BlankPaper::of_stroke(&paper_stroke(svg)), None);
     }
 }

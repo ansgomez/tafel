@@ -126,6 +126,8 @@
           </child>
           <child>
             <object class="GtkBox" id="fixedsize_quickactions_box">
+              <!-- Pages are inserted and deleted with the toolbar, which keeps them consistent with undo -->
+              <property name="visible">false</property>
               <property name="orientation">horizontal</property>
               <property name="spacing">6</property>
               <property name="hexpand">true</property>

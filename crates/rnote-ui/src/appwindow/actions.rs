@@ -1261,8 +1261,6 @@ impl RnAppWindow {
         app.set_accels_for_action("win.return-origin-page", &["<Ctrl>Home"]);
         app.set_accels_for_action("win.clear-doc", &["<Ctrl>l"]);
         app.set_accels_for_action("win.print-doc", &["<Ctrl>p"]);
-        app.set_accels_for_action("win.add-page-to-doc", &["<Ctrl><Shift>a"]);
-        app.set_accels_for_action("win.remove-page-from-doc", &["<Ctrl><Shift>r"]);
         app.set_accels_for_action("win.page-prev", &["<Alt>Page_Up"]);
         app.set_accels_for_action("win.page-next", &["<Alt>Page_Down"]);
         app.set_accels_for_action("win.page-insert-after", &["<Ctrl><Shift>b"]);

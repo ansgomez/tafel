@@ -86,7 +86,9 @@ impl Selector {
                         let key_to_add = engine_view
                             .store
                             .stroke_hitboxes_contain_coord(
-                                engine_view.camera.viewport(),
+                                engine_view
+                                    .document
+                                    .clip_to_shown_page(engine_view.camera.viewport()),
                                 element.pos,
                             )
                             .pop();
@@ -432,7 +434,9 @@ impl Selector {
                                     engine_view
                                         .store
                                         .stroke_hitboxes_contain_coord(
-                                            engine_view.camera.viewport(),
+                                            engine_view
+                                                .document
+                                                .clip_to_shown_page(engine_view.camera.viewport()),
                                             last.pos,
                                         )
                                         .pop()
@@ -443,12 +447,16 @@ impl Selector {
                                 .store
                                 .strokes_hitboxes_contained_in_path_polygon(
                                     path,
-                                    engine_view.camera.viewport(),
+                                    engine_view
+                                        .document
+                                        .clip_to_shown_page(engine_view.camera.viewport()),
                                 ),
                             SelectingShape::Rectangle(aabb) => {
                                 engine_view.store.strokes_hitboxes_contained_in_aabb(
                                     aabb,
-                                    engine_view.camera.viewport(),
+                                    engine_view
+                                        .document
+                                        .clip_to_shown_page(engine_view.camera.viewport()),
                                 )
                             }
                         }
@@ -460,7 +468,9 @@ impl Selector {
                             let aabb = Aabb::new_positive(first.pos, last.pos);
                             engine_view.store.strokes_hitboxes_contained_in_aabb(
                                 aabb,
-                                engine_view.camera.viewport(),
+                                engine_view
+                                    .document
+                                    .clip_to_shown_page(engine_view.camera.viewport()),
                             )
                         } else {
                             vec![]
@@ -471,7 +481,9 @@ impl Selector {
                             engine_view
                                 .store
                                 .stroke_hitboxes_contain_coord(
-                                    engine_view.camera.viewport(),
+                                    engine_view
+                                        .document
+                                        .clip_to_shown_page(engine_view.camera.viewport()),
                                     last.pos,
                                 )
                                 .pop()
@@ -485,7 +497,9 @@ impl Selector {
                         if path.len() >= 3 {
                             engine_view.store.strokes_hitboxes_intersect_path(
                                 path,
-                                engine_view.camera.viewport(),
+                                engine_view
+                                    .document
+                                    .clip_to_shown_page(engine_view.camera.viewport()),
                             )
                         } else {
                             vec![]

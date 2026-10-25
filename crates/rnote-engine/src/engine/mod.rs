@@ -37,7 +37,7 @@ use p2d::bounding_volume::{Aabb, BoundingVolume};
 use p2d::math::Vector2;
 use rnote_compose::eventresult::EventPropagation;
 use rnote_compose::ext::AabbExt;
-use rnote_compose::penevent::{PenEvent, ShortcutKey};
+use rnote_compose::penevent::{PenEvent, PenProgress, ShortcutKey};
 use rnote_compose::{Color, SplitOrder};
 use serde::{Deserialize, Serialize};
 use snapshot::Snapshotable;
@@ -489,6 +489,27 @@ impl Engine {
         pen_mode: Option<PenMode>,
         now: Instant,
     ) -> (EventPropagation, WidgetFlags) {
+        // When a single page is shown, the pen only acts on that page: input that starts
+        // outside of it is ignored, and input that leaves it is kept at its border.
+        let event = match (event, self.document.single_page_bounds()) {
+            (
+                PenEvent::Down {
+                    mut element,
+                    modifier_keys,
+                },
+                Some(page),
+            ) if element.pos != element.pos.clamp(page.mins, page.maxs) => {
+                if self.penholder.current_pen_progress() == PenProgress::Idle {
+                    return (EventPropagation::Proceed, WidgetFlags::default());
+                }
+                element.pos = element.pos.clamp(page.mins, page.maxs);
+                PenEvent::Down {
+                    element,
+                    modifier_keys,
+                }
+            }
+            (event, _) => event,
+        };
         self.penholder
             .handle_pen_event(event, pen_mode, now, &mut engine_view_mut!(self))
     }

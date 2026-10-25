@@ -7,7 +7,7 @@ use crate::{DrawableOnDoc, WidgetFlags};
 use p2d::bounding_volume::Aabb;
 use piet::RenderContext;
 use rnote_compose::eventresult::{EventPropagation, EventResult};
-use rnote_compose::ext::Vector2Ext;
+use rnote_compose::ext::AabbExt;
 use rnote_compose::penevent::{PenEvent, PenProgress};
 use rnote_compose::penpath::Element;
 use std::time::Instant;
@@ -179,7 +179,7 @@ impl DrawableOnDoc for Eraser {
     ) -> anyhow::Result<()> {
         cx.save().map_err(|e| anyhow::anyhow!("{e:?}"))?;
 
-        // A round cursor: translucent white with a gray outline.
+        // A square cursor: translucent white with a gray outline.
         const OUTLINE_COLOR: piet::Color = piet::Color::rgb8(0x44, 0x44, 0x44);
         const FILL_COLOR: piet::Color = piet::Color::rgba8(0xff, 0xff, 0xff, 0x59);
         let outline_width = 1.5 / engine_view.camera.total_zoom();
@@ -196,11 +196,11 @@ impl DrawableOnDoc for Eraser {
                 .pens_config
                 .eraser_config
                 .eraser_bounds(*current_element);
-            let circle =
-                kurbo::Circle::new(bounds.center().to_kurbo_point(), bounds.half_extents().x);
+            // The cursor shows exactly the area that is erased.
+            let rect = bounds.to_kurbo_rect();
 
-            cx.fill(circle, &FILL_COLOR);
-            cx.stroke(circle, &OUTLINE_COLOR, outline_width);
+            cx.fill(rect, &FILL_COLOR);
+            cx.stroke(rect, &OUTLINE_COLOR, outline_width);
         }
 
         cx.restore().map_err(|e| anyhow::anyhow!("{e:?}"))?;
@@ -220,7 +220,9 @@ fn erase(element: Element, engine_view: &mut EngineViewMut) -> WidgetFlags {
                     .pens_config
                     .eraser_config
                     .eraser_bounds(element),
-                engine_view.camera.viewport(),
+                engine_view
+                    .document
+                    .clip_to_shown_page(engine_view.camera.viewport()),
             );
         }
         EraserStyle::SplitCollidingStrokes => {
@@ -230,7 +232,9 @@ fn erase(element: Element, engine_view: &mut EngineViewMut) -> WidgetFlags {
                     .pens_config
                     .eraser_config
                     .eraser_bounds(element),
-                engine_view.camera.viewport(),
+                engine_view
+                    .document
+                    .clip_to_shown_page(engine_view.camera.viewport()),
             );
             widget_flags |= wf;
 

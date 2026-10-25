@@ -869,8 +869,13 @@ impl Selector {
     }
 
     fn select_all(&mut self, engine_view: &mut EngineViewMut, widget_flags: &mut WidgetFlags) {
-        // Select all keys
-        let all_strokes = engine_view.store.stroke_keys_as_rendered();
+        // Select all keys, only those on the shown page when a single page is shown
+        let all_strokes = match engine_view.document.single_page_bounds() {
+            Some(page) => engine_view
+                .store
+                .stroke_keys_as_rendered_intersecting_bounds(page),
+            None => engine_view.store.stroke_keys_as_rendered(),
+        };
 
         if !all_strokes.is_empty() {
             engine_view.store.set_selected_keys(&all_strokes, true);

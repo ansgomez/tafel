@@ -114,6 +114,15 @@ impl Document {
         self.single_page_bounds().unwrap_or_else(|| self.bounds())
     }
 
+    /// Limit `bounds` (e.g. the viewport) to the shown page when a single page is shown at a
+    /// time, so tools do not reach strokes on the neighboring pages.
+    pub(crate) fn clip_to_shown_page(&self, bounds: Aabb) -> Aabb {
+        match self.single_page_bounds() {
+            Some(page) => bounds.intersection(&page).unwrap_or(page),
+            None => bounds,
+        }
+    }
+
     /// Generate bounds for each page for the doc bounds, extended to fit the format.
     ///
     /// May contain many empty pages (in infinite mode)

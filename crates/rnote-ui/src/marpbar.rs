@@ -973,6 +973,8 @@ impl RnMarpBar {
         let engine = canvas.engine_ref();
         let fixed_size = engine.document.config.layout == Layout::FixedSize;
         let current_blank = engine.doc_current_page_is_blank();
+        // On a blank page its paper is shown, elsewhere the paper for new blank pages.
+        let current_paper = engine.doc_current_page_paper();
         let n_pages = engine.doc_n_pages();
 
         for item in imp.items.borrow().iter() {
@@ -981,7 +983,10 @@ impl RnMarpBar {
                 ItemKind::Tool(t) => (tool == Some(t), true),
                 ItemKind::Color(i) => (
                     color.is_some_and(|c| c.approx_eq(parse_hex(COLORS[i].1))),
-                    tool.is_some_and(|t| t.has_color()),
+                    // The highlighter multiplies its color, so white would not show.
+                    tool.is_some_and(|t| {
+                        t.has_color() && !(t == MarpTool::Highlighter && COLORS[i].1 == "#ffffff")
+                    }),
                 ),
                 ItemKind::Size(i) => (
                     size_index == Some(i),
@@ -993,7 +998,7 @@ impl RnMarpBar {
                 ItemKind::PagePrev => (false, engine.doc_can_go_to_page_relative(-1)),
                 ItemKind::PageNext => (false, engine.doc_can_go_to_page_relative(1)),
                 ItemKind::PageInsert => (false, fixed_size),
-                ItemKind::Paper(paper) => (imp.paper.get() == paper, true),
+                ItemKind::Paper(paper) => (current_paper.unwrap_or(imp.paper.get()) == paper, true),
                 ItemKind::PageDelete => (false, fixed_size && current_blank && n_pages > 1),
                 ItemKind::Save | ItemKind::Open | ItemKind::Pdf => (false, true),
             };
