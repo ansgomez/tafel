@@ -82,6 +82,8 @@ impl Camera {
     pub const ZOOM_TIMEOUT: Duration = Duration::from_millis(400);
     // when performing a drag - zoom 0.5% zoom for every pixel in y dir
     pub const DRAG_ZOOM_MAGN_ZOOM_FACTOR: f64 = 0.005;
+    /// Space around the page when a single page is shown, in surface pixels.
+    pub const SINGLE_PAGE_MARGIN: f64 = 8.0;
     pub const OVERSHOOT_HORIZONTAL: f64 = 96.0;
     pub const OVERSHOOT_VERTICAL: f64 = 96.0;
 
@@ -125,6 +127,16 @@ impl Camera {
     /// The minimum and maximum surface bounds (document including overshoot) in surface coordinate space.
     pub fn surface_mins_maxs(&self, doc: &Document) -> (Vector2, Vector2) {
         let total_zoom = self.total_zoom();
+
+        if let Some(page) = doc.single_page_bounds() {
+            // Only the shown page can be scrolled to. It is centered when it is smaller than
+            // the viewport.
+            let lower = page.mins * total_zoom - Vector2::splat(Self::SINGLE_PAGE_MARGIN);
+            let upper = page.maxs * total_zoom + Vector2::splat(Self::SINGLE_PAGE_MARGIN);
+            let center = (lower + upper) * 0.5;
+            let half = ((upper - lower) * 0.5).max(self.size * 0.5);
+            return (center - half, center + half);
+        }
 
         let (h_lower, h_upper) = match doc.config.layout {
             Layout::FixedSize | Layout::ContinuousVertical => (
@@ -230,6 +242,11 @@ impl Camera {
         }
 
         widget_flags
+    }
+
+    /// Cancel a pending permanent zoom that was started by [Self::zoom_w_timeout].
+    pub(crate) fn cancel_zoom_timeout(&mut self) {
+        self.zoom_task_handle = None;
     }
 
     /// The total zoom of the camera, including the temporary zoom.

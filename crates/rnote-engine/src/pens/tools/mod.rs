@@ -22,7 +22,7 @@ use rnote_compose::eventresult::EventResult;
 use rnote_compose::penevent::{PenEvent, PenProgress};
 use std::time::Instant;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum ToolsState {
     Idle,
     Active,

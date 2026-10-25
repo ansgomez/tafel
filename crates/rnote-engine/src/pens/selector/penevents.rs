@@ -1,5 +1,5 @@
 // Imports
-use super::{ModifyState, ResizeCorner, Selector, SelectorState};
+use super::{ModifyState, ResizeCorner, SelectingShape, Selector, SelectorState};
 use crate::WidgetFlags;
 use crate::engine::EngineViewMut;
 use crate::pens::PenBehaviour;
@@ -424,15 +424,33 @@ impl Selector {
 
                 let new_selection = match engine_view.config.pens_config.selector_config.style {
                     SelectorStyle::Polygon => {
-                        if path.len() >= 3 {
-                            engine_view
+                        // A tap selects the topmost stroke, a drag a rectangle, a circle a lasso.
+                        match SelectingShape::of_path(path, engine_view.camera.total_zoom()) {
+                            SelectingShape::Tap => path
+                                .last()
+                                .and_then(|last| {
+                                    engine_view
+                                        .store
+                                        .stroke_hitboxes_contain_coord(
+                                            engine_view.camera.viewport(),
+                                            last.pos,
+                                        )
+                                        .pop()
+                                })
+                                .into_iter()
+                                .collect(),
+                            SelectingShape::Lasso => engine_view
                                 .store
                                 .strokes_hitboxes_contained_in_path_polygon(
                                     path,
                                     engine_view.camera.viewport(),
+                                ),
+                            SelectingShape::Rectangle(aabb) => {
+                                engine_view.store.strokes_hitboxes_contained_in_aabb(
+                                    aabb,
+                                    engine_view.camera.viewport(),
                                 )
-                        } else {
-                            vec![]
+                            }
                         }
                     }
                     SelectorStyle::Rectangle => {

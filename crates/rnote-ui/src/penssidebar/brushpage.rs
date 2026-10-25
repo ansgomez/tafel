@@ -127,6 +127,7 @@ impl RnBrushPage {
             .pens_config
             .brush_config
             .style = brush_style;
+        appwindow.sync_penpicker();
         self.stroke_width_picker().deselect_setters();
 
         match brush_style {

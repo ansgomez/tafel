@@ -526,8 +526,16 @@ mod imp {
                 let new_zoom = Rc::new(Cell::new(1.0));
                 let bbcenter_begin: Rc<Cell<Option<Vector2>>> = Rc::new(Cell::new(None));
                 let offset_begin = Rc::new(Cell::new(Vector2::ZERO));
+                // A quick, horizontal two finger swipe turns the page.
+                let swipe_begin: Rc<Cell<Option<(Vector2, std::time::Instant)>>> =
+                    Rc::new(Cell::new(None));
+                let swipe_last: Rc<Cell<Option<Vector2>>> = Rc::new(Cell::new(None));
 
                 self.canvas_zoom_gesture.connect_begin(clone!(
+                    #[strong]
+                    swipe_begin,
+                    #[strong]
+                    swipe_last,
                     #[strong]
                     zoom_begin,
                     #[strong]
@@ -558,10 +566,18 @@ mod imp {
                                 .map(|(x, y)| Vector2::new(x, y)),
                         );
                         offset_begin.set(canvaswrapper.canvas().engine_ref().camera.offset());
+                        swipe_begin.set(
+                            gesture
+                                .bounding_box_center()
+                                .map(|(x, y)| (Vector2::new(x, y), std::time::Instant::now())),
+                        );
+                        swipe_last.set(None);
                     }
                 ));
 
                 self.canvas_zoom_gesture.connect_scale_changed(clone!(
+                    #[strong]
+                    swipe_last,
                     #[strong]
                     zoom_begin,
                     #[strong]
@@ -590,6 +606,7 @@ mod imp {
                             .bounding_box_center()
                             .map(|(x, y)| Vector2::new(x, y))
                         {
+                            swipe_last.set(Some(bbcenter_current));
                             let bbcenter_begin = if let Some(bbcenter_begin) = bbcenter_begin.get()
                             {
                                 bbcenter_begin
@@ -610,16 +627,33 @@ mod imp {
                 ));
 
                 self.canvas_zoom_gesture.connect_end(clone!(
+                    #[strong]
+                    prev_scale,
+                    #[strong]
+                    swipe_begin,
+                    #[strong]
+                    swipe_last,
                     #[weak(rename_to=canvaswrapper)]
                     obj,
                     move |_gesture, _event_sequence| {
                         // workaround for https://gitlab.gnome.org/GNOME/gtk/-/issues/187
                         canvaswrapper.imp().workaround_restore_kinetic_scrolling();
 
-                        let widget_flags = canvaswrapper
+                        let mut widget_flags = canvaswrapper
                             .canvas()
                             .engine_mut()
                             .update_rendering_current_viewport();
+                        if let (Some((begin, time)), Some(last)) =
+                            (swipe_begin.take(), swipe_last.take())
+                            && let Some(step) =
+                                swipe_page_step(last - begin, prev_scale.get(), time.elapsed())
+                            && canvaswrapper.canvas().engine_ref().doc_single_page()
+                        {
+                            widget_flags |= canvaswrapper
+                                .canvas()
+                                .engine_mut()
+                                .doc_go_to_page_relative(step);
+                        }
                         canvaswrapper
                             .canvas()
                             .emit_handle_widget_flags(widget_flags);
@@ -1028,4 +1062,18 @@ impl RnCanvasWrapper {
     pub(crate) fn connect_to_tab_page(&self, page: &adw::TabPage) {
         self.canvas().connect_to_tab_page(page);
     }
+}
+
+/// The page step for a two finger swipe that moved by `delta` (in pixels) and zoomed by `scale`
+/// in `duration`: 1 (to the left: next page), -1 (to the right: previous page) or `None` when it
+/// is too short, too slow, not clearly horizontal or rather a pinch.
+fn swipe_page_step(delta: Vector2, scale: f64, duration: std::time::Duration) -> Option<i32> {
+    if delta.x.abs() < 80.0
+        || (scale - 1.0).abs() > 0.15
+        || delta.x.abs() < 2.0 * delta.y.abs()
+        || duration > std::time::Duration::from_millis(700)
+    {
+        return None;
+    }
+    Some(if delta.x < 0.0 { 1 } else { -1 })
 }

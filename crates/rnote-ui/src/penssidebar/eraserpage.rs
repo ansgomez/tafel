@@ -122,6 +122,7 @@ impl RnEraserPage {
                         .pens_config
                         .eraser_config
                         .style = EraserStyle::TrashCollidingStrokes;
+                    appwindow.sync_penpicker();
                 }
             ));
 
@@ -139,6 +140,7 @@ impl RnEraserPage {
                         .pens_config
                         .eraser_config
                         .style = EraserStyle::SplitCollidingStrokes;
+                    appwindow.sync_penpicker();
                 }
             ));
 

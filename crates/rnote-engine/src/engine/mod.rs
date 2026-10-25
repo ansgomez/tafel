@@ -3,6 +3,7 @@ pub mod animation;
 pub mod config;
 pub mod export;
 pub mod import;
+pub mod pages;
 pub mod rendering;
 pub mod snapshot;
 pub mod strokecontent;
@@ -14,6 +15,7 @@ pub use config::EngineConfig;
 pub use config::EngineConfigShared;
 pub use export::ExportPrefs;
 pub use import::ImportPrefs;
+pub use pages::{BlankPaper, PageLabel};
 pub use snapshot::EngineSnapshot;
 pub use strokecontent::{LayeredStroke, StrokeContent};
 
@@ -368,6 +370,7 @@ impl Engine {
     pub fn undo(&mut self, now: Instant) -> WidgetFlags {
         self.store.undo(now)
             | self.doc_resize_autoexpand()
+            | self.doc_resize_paged()
             | self.current_pen_update_state()
             | self.update_rendering_current_viewport()
     }
@@ -376,6 +379,7 @@ impl Engine {
     pub fn redo(&mut self, now: Instant) -> WidgetFlags {
         self.store.redo(now)
             | self.doc_resize_autoexpand()
+            | self.doc_resize_paged()
             | self.current_pen_update_state()
             | self.update_rendering_current_viewport()
     }

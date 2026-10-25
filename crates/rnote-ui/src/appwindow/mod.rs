@@ -367,6 +367,13 @@ impl RnAppWindow {
                 .refresh_zoom_reset_label(total_zoom);
             canvas.queue_resize();
         }
+        if widget_flags.store_modified
+            || widget_flags.refresh_ui
+            || widget_flags.view_modified
+            || widget_flags.zoomed
+        {
+            self.overlays().marpbar().queue_refresh(self);
+        }
         if widget_flags.deselect_color_setters {
             self.overlays().colorpicker().deselect_setters();
         }
@@ -758,6 +765,19 @@ impl RnAppWindow {
         Ok(file_imported)
     }
 
+    /// Activate the pen picker button that matches the current pen style and sub-style.
+    pub(crate) fn sync_penpicker(&self) {
+        let Some(canvas) = self.active_tab_canvas() else {
+            return;
+        };
+        let pen_style = canvas.engine_ref().current_pen_style_w_override();
+        // Cloned, because activating a button may write to the config.
+        let pens_config = self.engine_config().read().pens_config.clone();
+        self.overlays()
+            .penpicker()
+            .sync_active_tool(pen_style, &pens_config);
+    }
+
     /// Refresh the UI from the global state and from the current active tab page.
     pub(crate) fn refresh_ui(&self) {
         let canvas = self.active_tab_canvas();
@@ -805,9 +825,10 @@ impl RnAppWindow {
             self.set_visual_debug(visual_debug);
 
             // Current pen
+            self.sync_penpicker();
+            self.overlays().marpbar().refresh(self);
             match pen_style {
                 PenStyle::Brush => {
-                    self.overlays().penpicker().brush_toggle().set_active(true);
                     self.overlays()
                         .penssidebar()
                         .sidebar_stack()
@@ -879,7 +900,6 @@ impl RnAppWindow {
                     }
                 }
                 PenStyle::Shaper => {
-                    self.overlays().penpicker().shaper_toggle().set_active(true);
                     self.overlays()
                         .penssidebar()
                         .sidebar_stack()
@@ -939,10 +959,6 @@ impl RnAppWindow {
                 }
                 PenStyle::Typewriter => {
                     self.overlays()
-                        .penpicker()
-                        .typewriter_toggle()
-                        .set_active(true);
-                    self.overlays()
                         .penssidebar()
                         .sidebar_stack()
                         .set_visible_child_name("typewriter_page");
@@ -959,7 +975,6 @@ impl RnAppWindow {
                         .set_stroke_color(gdk::RGBA::from_compose_color(text_color));
                 }
                 PenStyle::Eraser => {
-                    self.overlays().penpicker().eraser_toggle().set_active(true);
                     self.overlays()
                         .penssidebar()
                         .sidebar_stack()
@@ -967,16 +982,11 @@ impl RnAppWindow {
                 }
                 PenStyle::Selector => {
                     self.overlays()
-                        .penpicker()
-                        .selector_toggle()
-                        .set_active(true);
-                    self.overlays()
                         .penssidebar()
                         .sidebar_stack()
                         .set_visible_child_name("selector_page");
                 }
                 PenStyle::Tools => {
-                    self.overlays().penpicker().tools_toggle().set_active(true);
                     self.overlays()
                         .penssidebar()
                         .sidebar_stack()

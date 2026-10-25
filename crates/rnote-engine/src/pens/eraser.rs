@@ -4,11 +4,10 @@ use super::PenStyle;
 use super::pensconfig::eraserconfig::EraserStyle;
 use crate::engine::{EngineView, EngineViewMut};
 use crate::{DrawableOnDoc, WidgetFlags};
-use p2d::bounding_volume::{Aabb, BoundingVolume};
+use p2d::bounding_volume::Aabb;
 use piet::RenderContext;
-use rnote_compose::color;
 use rnote_compose::eventresult::{EventPropagation, EventResult};
-use rnote_compose::ext::AabbExt;
+use rnote_compose::ext::Vector2Ext;
 use rnote_compose::penevent::{PenEvent, PenProgress};
 use rnote_compose::penpath::Element;
 use std::time::Instant;
@@ -180,39 +179,28 @@ impl DrawableOnDoc for Eraser {
     ) -> anyhow::Result<()> {
         cx.save().map_err(|e| anyhow::anyhow!("{e:?}"))?;
 
-        const OUTLINE_COLOR: piet::Color = color::GNOME_REDS[2].with_a8(240);
-        const FILL_COLOR: piet::Color = color::GNOME_REDS[0].with_a8(160);
-        const PROXIMITY_FILL_COLOR: piet::Color = color::GNOME_REDS[0].with_a8(51);
-        let outline_width = 2.0 / engine_view.camera.total_zoom();
+        // A round cursor: translucent white with a gray outline.
+        const OUTLINE_COLOR: piet::Color = piet::Color::rgb8(0x44, 0x44, 0x44);
+        const FILL_COLOR: piet::Color = piet::Color::rgba8(0xff, 0xff, 0xff, 0x59);
+        let outline_width = 1.5 / engine_view.camera.total_zoom();
 
-        match &self.state {
-            EraserState::Up => {}
-            EraserState::Proximity(current_element) => {
-                let bounds = engine_view
-                    .config
-                    .pens_config
-                    .eraser_config
-                    .eraser_bounds(*current_element);
-
-                let fill_rect = bounds.to_kurbo_rect();
-                let outline_rect = bounds.tightened(outline_width * 0.5).to_kurbo_rect();
-
-                cx.fill(fill_rect, &PROXIMITY_FILL_COLOR);
-                cx.stroke(outline_rect, &OUTLINE_COLOR, outline_width);
+        let current_element = match &self.state {
+            EraserState::Up => None,
+            EraserState::Proximity(current_element) | EraserState::Down(current_element) => {
+                Some(current_element)
             }
-            EraserState::Down(current_element) => {
-                let bounds = engine_view
-                    .config
-                    .pens_config
-                    .eraser_config
-                    .eraser_bounds(*current_element);
+        };
+        if let Some(current_element) = current_element {
+            let bounds = engine_view
+                .config
+                .pens_config
+                .eraser_config
+                .eraser_bounds(*current_element);
+            let circle =
+                kurbo::Circle::new(bounds.center().to_kurbo_point(), bounds.half_extents().x);
 
-                let fill_rect = bounds.to_kurbo_rect();
-                let outline_rect = bounds.tightened(outline_width * 0.5).to_kurbo_rect();
-
-                cx.fill(fill_rect, &FILL_COLOR);
-                cx.stroke(outline_rect, &OUTLINE_COLOR, outline_width);
-            }
+            cx.fill(circle, &FILL_COLOR);
+            cx.stroke(circle, &OUTLINE_COLOR, outline_width);
         }
 
         cx.restore().map_err(|e| anyhow::anyhow!("{e:?}"))?;

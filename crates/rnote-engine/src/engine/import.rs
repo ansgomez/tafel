@@ -60,7 +60,8 @@ pub enum PdfImportPageSpacing {
 
 impl Default for PdfImportPageSpacing {
     fn default() -> Self {
-        Self::Continuous
+        // One PDF page per document page, so page navigation and inserting pages line up.
+        Self::OnePerDocumentPage
     }
 }
 
@@ -102,10 +103,11 @@ impl Default for PdfImportPrefs {
     fn default() -> Self {
         Self {
             pages_type: PdfImportPagesType::default(),
-            page_width_perc: 50.0,
+            page_width_perc: 100.0,
             page_spacing: PdfImportPageSpacing::default(),
             bitmap_scalefactor: 1.8,
-            adjust_document: false,
+            // Annotating a Pdf: its pages become the document pages.
+            adjust_document: true,
         }
     }
 }
@@ -336,6 +338,10 @@ impl Engine {
         widget_flags.store_modified = true;
         widget_flags.refresh_ui = true;
 
+        if adjust_document {
+            // Start on the first page, fitted into the view.
+            widget_flags |= self.doc_go_to_page(0);
+        }
         widget_flags
     }
 

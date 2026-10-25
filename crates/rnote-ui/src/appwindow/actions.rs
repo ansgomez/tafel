@@ -12,6 +12,7 @@ use p2d::bounding_volume::BoundingVolume;
 use p2d::math::Vector2;
 use rnote_compose::SplitOrder;
 use rnote_compose::penevent::ShortcutKey;
+use rnote_engine::document::Layout;
 use rnote_engine::document::format::MeasureUnit;
 use rnote_engine::engine::StrokeContent;
 use rnote_engine::ext::GraphenePointExt;
@@ -81,6 +82,14 @@ impl RnAppWindow {
         self.add_action(&action_add_page_to_doc);
         let action_remove_page_from_doc = gio::SimpleAction::new("remove-page-from-doc", None);
         self.add_action(&action_remove_page_from_doc);
+        let action_page_prev = gio::SimpleAction::new("page-prev", None);
+        self.add_action(&action_page_prev);
+        let action_page_next = gio::SimpleAction::new("page-next", None);
+        self.add_action(&action_page_next);
+        let action_page_insert_after = gio::SimpleAction::new("page-insert-after", None);
+        self.add_action(&action_page_insert_after);
+        let action_page_delete = gio::SimpleAction::new("page-delete", None);
+        self.add_action(&action_page_delete);
         let action_resize_to_fit_content = gio::SimpleAction::new("resize-to-fit-content", None);
         self.add_action(&action_resize_to_fit_content);
         let action_return_origin_page = gio::SimpleAction::new("return-origin-page", None);
@@ -783,6 +792,64 @@ impl RnAppWindow {
             }
         ));
 
+        // Page navigation: previous and next page
+        for (action, delta) in [(&action_page_prev, -1), (&action_page_next, 1)] {
+            action.connect_activate(clone!(
+                #[weak(rename_to=appwindow)]
+                self,
+                move |_, _| {
+                    let Some(wrapper) = appwindow.active_tab_wrapper() else {
+                        return;
+                    };
+                    // workaround for https://gitlab.gnome.org/GNOME/gtk/-/issues/187
+                    wrapper.workaround_cancel_kinetic_scrolling_for_zoom();
+                    let canvas = wrapper.canvas();
+                    let widget_flags = canvas.engine_mut().doc_go_to_page_relative(delta);
+                    appwindow.handle_widget_flags(widget_flags, &canvas);
+                }
+            ));
+        }
+
+        // Insert a blank page after the current page in fixed size mode
+        action_page_insert_after.connect_activate(clone!(
+            #[weak(rename_to=appwindow)]
+            self,
+            move |_, _| {
+                let Some(canvas) = appwindow.active_tab_canvas() else {
+                    return;
+                };
+                if canvas.engine_ref().document.config.layout != Layout::FixedSize {
+                    appwindow.overlays().dispatch_toast_text(
+                        &gettext("Pages can only be inserted in the fixed size document layout"),
+                        None,
+                    );
+                    return;
+                }
+                let paper = appwindow.overlays().marpbar().paper();
+                let widget_flags = canvas.engine_mut().doc_insert_page_after_current(paper);
+                appwindow.handle_widget_flags(widget_flags, &canvas);
+            }
+        ));
+
+        // Delete the current page in fixed size mode, when it is a blank page
+        action_page_delete.connect_activate(clone!(
+            #[weak(rename_to=appwindow)]
+            self,
+            move |_, _| {
+                let Some(canvas) = appwindow.active_tab_canvas() else {
+                    return;
+                };
+                let (deleted, widget_flags) =
+                    canvas.engine_mut().doc_delete_current_page_if_blank();
+                appwindow.handle_widget_flags(widget_flags, &canvas);
+                if !deleted {
+                    appwindow
+                        .overlays()
+                        .dispatch_toast_text(&gettext("Only blank pages can be deleted"), None);
+                }
+            }
+        ));
+
         // Remove page from doc in fixed size mode
         action_remove_page_from_doc.connect_activate(clone!(
             #[weak(rename_to=appwindow)]
@@ -1196,6 +1263,9 @@ impl RnAppWindow {
         app.set_accels_for_action("win.print-doc", &["<Ctrl>p"]);
         app.set_accels_for_action("win.add-page-to-doc", &["<Ctrl><Shift>a"]);
         app.set_accels_for_action("win.remove-page-from-doc", &["<Ctrl><Shift>r"]);
+        app.set_accels_for_action("win.page-prev", &["<Alt>Page_Up"]);
+        app.set_accels_for_action("win.page-next", &["<Alt>Page_Down"]);
+        app.set_accels_for_action("win.page-insert-after", &["<Ctrl><Shift>b"]);
         app.set_accels_for_action(
             "win.zoom-in",
             &["<Ctrl>plus", "<Ctrl>equal", "<Ctrl>KP_Add"],

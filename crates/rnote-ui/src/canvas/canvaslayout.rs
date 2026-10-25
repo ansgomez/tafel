@@ -74,8 +74,20 @@ mod imp {
             canvas.configure_adjustments(new_size, adjustment_maxs, adjustment_value);
 
             // Update the camera size and re-clamp the offset to the new size
+            let size_changed = canvas.engine_ref().camera.size() != new_size;
             let _ = canvas.engine_mut().camera_set_size(new_size);
             let _ = canvas.engine_mut().camera_set_offset(offset);
+            let needs_fit = size_changed || canvas.engine_ref().document.needs_fit;
+            if needs_fit && canvas.engine_ref().doc_single_page() {
+                // A single page is always fitted into the view, like a slide.
+                let widget_flags = canvas.engine_mut().doc_fit_current_page();
+                // Not while allocating: handling the flags resizes the canvas.
+                gtk4::glib::idle_add_local_once(gtk4::glib::clone!(
+                    #[weak]
+                    canvas,
+                    move || canvas.emit_handle_widget_flags(widget_flags)
+                ));
+            }
 
             // Calculate new viewport from the updated camera state
             let old_viewport = self.old_viewport.get();

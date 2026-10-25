@@ -1,6 +1,7 @@
 // Imports
 use crate::store::chrono_comp::StrokeLayer;
 use rand::{RngExt, SeedableRng};
+use rnote_compose::Color;
 use rnote_compose::Style;
 use rnote_compose::builders::PenPathBuilderType;
 use rnote_compose::style::PressureCurve;
@@ -54,9 +55,23 @@ impl Default for MarkerOptions {
         let mut options = SmoothOptions::default();
         options.pressure_curve = PressureCurve::Const;
         options.stroke_width = 12.0;
+        options.stroke_color = Some(Self::DEFAULT_COLOR);
 
         Self(options)
     }
+}
+
+impl MarkerOptions {
+    /// Yellow, like a highlighter pen.
+    const DEFAULT_COLOR: Color = Color {
+        r: 1.0,
+        g: 0.824,
+        b: 0.0,
+        a: 1.0,
+    };
+    /// Highlighter strokes are this translucent, on top of being blended multiplicatively,
+    /// so that a fully opaque palette color still lets the content below shine through.
+    pub const OPACITY: f64 = 0.35;
 }
 
 impl std::ops::Deref for MarkerOptions {
@@ -132,7 +147,10 @@ impl BrushConfig {
     pub(crate) fn style_for_current_options(&self) -> Style {
         match &self.style {
             BrushStyle::Marker => {
-                let MarkerOptions(options) = self.marker_options.clone();
+                let MarkerOptions(mut options) = self.marker_options.clone();
+                if let Some(color) = options.stroke_color.as_mut() {
+                    color.a *= MarkerOptions::OPACITY;
+                }
 
                 Style::Smooth(options)
             }

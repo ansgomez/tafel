@@ -30,6 +30,7 @@
         </property>
         <child type="start">
           <object class="GtkBox" id="quickactions_box">
+            <property name="visible">false</property>
             <property name="limit-events">true</property>
             <property name="spacing">3</property>
             <child>
@@ -72,6 +73,8 @@
             <property name="spacing">3</property>
             <child>
               <object class="GtkButton">
+                <!-- Saving is in the toolbar -->
+                <property name="visible">false</property>
                 <property name="tooltip-text" translatable="yes">Save Document</property>
                 <property name="icon-name">save-symbolic</property>
                 <property name="action-name">win.save-doc</property>
@@ -79,6 +82,7 @@
             </child>
             <child>
               <object class="GtkToggleButton" id="right_sidebar_reveal_toggle">
+                <property name="visible">false</property>
                 <property name="icon_name">sidebar-reveal-symbolic</property>
                 <property name="tooltip_text" translatable="yes">Show/Hide Sidebar</property>
               </object>

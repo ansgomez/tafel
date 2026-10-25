@@ -34,6 +34,16 @@ pub struct Document {
     pub width: f64,
     #[serde(rename = "height", with = "rnote_compose::serialize::f64_dp3")]
     pub height: f64,
+    /// The page that is shown in the fixed size layout, which shows a single page at a time.
+    #[serde(skip)]
+    pub shown_page: u32,
+    /// Whether the shown page still needs to be fitted into the view, e.g. after loading.
+    #[serde(skip, default = "needs_fit_default")]
+    pub needs_fit: bool,
+}
+
+fn needs_fit_default() -> bool {
+    true
 }
 
 impl Default for Document {
@@ -44,6 +54,8 @@ impl Default for Document {
             y: 0.0,
             width: Format::default().width(),
             height: Format::default().height(),
+            shown_page: 0,
+            needs_fit: true,
         }
     }
 }
@@ -69,6 +81,37 @@ impl Document {
             Vector2::new(self.x, self.y),
             Vector2::new(self.x + self.width, self.y + self.height),
         )
+    }
+
+    /// The number of pages, by the format height.
+    pub(crate) fn n_pages(&self) -> u32 {
+        let format_height = self.config.format.height();
+        if format_height <= 0.0 {
+            return 0;
+        }
+        (self.height / format_height).round().max(1.0) as u32
+    }
+
+    /// The bounds of the shown page when a single page is shown at a time (in the fixed size
+    /// layout).
+    pub(crate) fn single_page_bounds(&self) -> Option<Aabb> {
+        let format_height = self.config.format.height();
+        if self.config.layout != Layout::FixedSize || format_height <= 0.0 {
+            return None;
+        }
+        let page = self.shown_page.min(self.n_pages().saturating_sub(1));
+        let top = self.y + page as f64 * format_height;
+        Some(Aabb::new(
+            Vector2::new(self.x, top),
+            Vector2::new(self.x + self.width, top + format_height),
+        ))
+    }
+
+    /// The bounds of what is shown: the shown page in the fixed size layout, otherwise the
+    /// whole document.
+    #[allow(unused)]
+    pub(crate) fn view_bounds(&self) -> Aabb {
+        self.single_page_bounds().unwrap_or_else(|| self.bounds())
     }
 
     /// Generate bounds for each page for the doc bounds, extended to fit the format.

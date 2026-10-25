@@ -79,6 +79,13 @@ impl ChronoComponent {
 
 /// Systems that are related to their chronological ordering.
 impl StrokeStore {
+    /// The layer of the stroke.
+    pub(crate) fn stroke_layer(&self, key: StrokeKey) -> Option<StrokeLayer> {
+        self.chrono_components
+            .get(key)
+            .map(|chrono_comp| chrono_comp.layer)
+    }
+
     pub(crate) fn update_chrono_to_last(&mut self, key: StrokeKey) {
         if let Some(chrono_comp) = Arc::make_mut(&mut self.chrono_components).get_mut(key) {
             self.chrono_counter += 1;

@@ -10,17 +10,74 @@
     <child>
       <object class="GtkBox" id="toolbox">
         <property name="spacing">6</property>
-        <property name="width-request">350</property>
-        <property name="homogeneous">true</property>
+        <property name="homogeneous">false</property>
         <child>
           <object class="GtkToggleButton" id="brush_toggle">
             <property name="icon_name">pen-brush-symbolic</property>
-            <property name="tooltip_text" translatable="yes">Brush</property>
+            <property name="tooltip_text" translatable="yes">Pen</property>
             <property name="hexpand">true</property>
             <style>
               <class name="flat" />
             </style>
           </object>
+        </child>
+        <child>
+          <object class="GtkToggleButton" id="highlighter_toggle">
+            <property name="icon_name">pen-brush-style-marker-symbolic</property>
+            <property name="tooltip_text" translatable="yes">Highlighter</property>
+            <property name="hexpand">true</property>
+            <property name="group">brush_toggle</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkToggleButton" id="selector_toggle">
+            <property name="icon_name">pen-selector-symbolic</property>
+            <property name="tooltip_text" translatable="yes">Selector</property>
+            <property name="hexpand">true</property>
+            <property name="group">brush_toggle</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkToggleButton" id="laser_toggle">
+            <property name="icon_name">pen-tools-laser-symbolic</property>
+            <property name="tooltip_text" translatable="yes">Laser Pointer</property>
+            <property name="hexpand">true</property>
+            <property name="group">brush_toggle</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkToggleButton" id="eraser_toggle">
+            <property name="icon_name">pen-eraser-trash-colliding-strokes-symbolic</property>
+            <property name="tooltip_text" translatable="yes">Stroke Eraser: removes whole strokes</property>
+            <property name="hexpand">true</property>
+            <property name="group">brush_toggle</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkToggleButton" id="eraser_split_toggle">
+            <property name="icon_name">pen-eraser-split-colliding-strokes-symbolic</property>
+            <property name="tooltip_text" translatable="yes">Partial Eraser: erases only what it touches</property>
+            <property name="hexpand">true</property>
+            <property name="group">brush_toggle</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSeparator" />
         </child>
         <child>
           <object class="GtkToggleButton" id="shaper_toggle">
@@ -37,28 +94,6 @@
           <object class="GtkToggleButton" id="typewriter_toggle">
             <property name="icon_name">pen-typewriter-symbolic</property>
             <property name="tooltip_text" translatable="yes">Typewriter</property>
-            <property name="hexpand">true</property>
-            <property name="group">brush_toggle</property>
-            <style>
-              <class name="flat" />
-            </style>
-          </object>
-        </child>
-        <child>
-          <object class="GtkToggleButton" id="eraser_toggle">
-            <property name="icon_name">pen-eraser-symbolic</property>
-            <property name="tooltip_text" translatable="yes">Eraser</property>
-            <property name="hexpand">true</property>
-            <property name="group">brush_toggle</property>
-            <style>
-              <class name="flat" />
-            </style>
-          </object>
-        </child>
-        <child>
-          <object class="GtkToggleButton" id="selector_toggle">
-            <property name="icon_name">pen-selector-symbolic</property>
-            <property name="tooltip_text" translatable="yes">Selector</property>
             <property name="hexpand">true</property>
             <property name="group">brush_toggle</property>
             <style>
@@ -105,6 +140,56 @@
             <property name="icon_name">edit-redo-symbolic</property>
             <property name="tooltip_text" translatable="yes">Redo</property>
             <property name="action-name">win.redo</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparator"></object>
+    </child>
+    <child>
+      <object class="GtkBox">
+        <style>
+          <class name="linked" />
+        </style>
+        <child>
+          <object class="GtkButton">
+            <property name="icon_name">dir-up-symbolic</property>
+            <property name="tooltip_text" translatable="yes">Previous Page</property>
+            <property name="action-name">win.page-prev</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="icon_name">dir-down-symbolic</property>
+            <property name="tooltip_text" translatable="yes">Next Page</property>
+            <property name="action-name">win.page-next</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="icon_name">add-page-symbolic</property>
+            <property name="tooltip_text" translatable="yes">Insert Blank Page After This One</property>
+            <property name="action-name">win.page-insert-after</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="icon_name">remove-page-symbolic</property>
+            <property name="tooltip_text" translatable="yes">Delete This Page (only when empty)</property>
+            <property name="action-name">win.page-delete</property>
             <style>
               <class name="flat" />
             </style>

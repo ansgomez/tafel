@@ -168,7 +168,8 @@ impl Engine {
         use crate::{drawable::DrawableOnDoc, ext::GrapheneRectExt};
         use gtk4::{graphene, prelude::*};
 
-        let doc_bounds = self.document.bounds();
+        // Only the shown page in the single page view.
+        let doc_bounds = self.document.view_bounds();
         let viewport = self.camera.viewport();
         let camera_transform = self.camera.transform_for_gtk_snapshot();
 
@@ -211,7 +212,9 @@ impl Engine {
         // pop clip
         snapshot.pop();
 
-        self.draw_origin_indicator_to_gtk_snapshot(snapshot)?;
+        if self.document.single_page_bounds().is_none() {
+            self.draw_origin_indicator_to_gtk_snapshot(snapshot)?;
+        }
 
         snapshot.restore();
         /*
@@ -248,7 +251,7 @@ impl Engine {
 
         let shadow_width = Document::SHADOW_WIDTH;
         let shadow_offset = Document::SHADOW_OFFSET;
-        let doc_bounds = self.document.bounds();
+        let doc_bounds = self.document.view_bounds();
 
         let corner_radius =
             graphene::Size::new(shadow_width as f32 * 0.25, shadow_width as f32 * 0.25);
@@ -276,7 +279,7 @@ impl Engine {
         use crate::ext::{GdkRGBAExt, GrapheneRectExt};
         use gtk4::{gdk, graphene, gsk, prelude::*};
 
-        let doc_bounds = self.document.bounds();
+        let doc_bounds = self.document.view_bounds();
 
         snapshot.push_clip(&graphene::Rect::from_p2d_aabb(doc_bounds));
 

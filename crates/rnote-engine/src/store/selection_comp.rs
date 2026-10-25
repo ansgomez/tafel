@@ -1,4 +1,5 @@
 // Imports
+use super::chrono_comp::StrokeLayer;
 use super::render_comp::RenderCompState;
 use super::{StrokeKey, StrokeStore};
 use crate::strokes::Stroke;
@@ -47,6 +48,10 @@ impl StrokeStore {
 
     /// Set if the stroke is currently selected.
     pub(crate) fn set_selected(&mut self, key: StrokeKey, selected: bool) {
+        // Document pages (imported PDF pages and blank page paper) are fixed, like slides.
+        if selected && self.stroke_layer(key) == Some(StrokeLayer::Document) {
+            return;
+        }
         if let Some(selection_comp) = Arc::make_mut(&mut self.selection_components)
             .get_mut(key)
             .map(Arc::make_mut)

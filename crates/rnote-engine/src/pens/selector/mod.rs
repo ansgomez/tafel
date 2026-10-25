@@ -61,6 +61,44 @@ impl Default for ModifyState {
     }
 }
 
+/// What a selecting path selects with the polygon selector style.
+#[derive(Debug, Clone, Copy)]
+pub(super) enum SelectingShape {
+    /// The topmost stroke under the pen.
+    Tap,
+    /// The rectangle between the first and last point.
+    Rectangle(Aabb),
+    /// The polygon of the path.
+    Lasso,
+}
+
+impl SelectingShape {
+    /// Paths shorter than this (in screen pixels) are taps.
+    const TAP_MAX_LEN: f64 = 4.0;
+    /// Paths need to be at least this long (in screen pixels) to be a lasso.
+    const LASSO_MIN_LEN: f64 = 40.0;
+
+    /// A path that travels much farther than its chord is a lasso, otherwise a rectangle.
+    pub(super) fn of_path(path: &[Element], total_zoom: f64) -> Self {
+        let (Some(first), Some(last)) = (path.first(), path.last()) else {
+            return Self::Tap;
+        };
+        let len = path
+            .windows(2)
+            .map(|w| (w[1].pos - w[0].pos).length())
+            .sum::<f64>()
+            * total_zoom;
+        let chord = (last.pos - first.pos).length() * total_zoom;
+        if len < Self::TAP_MAX_LEN {
+            Self::Tap
+        } else if path.len() >= 3 && len > Self::LASSO_MIN_LEN && len > 1.8 * chord {
+            Self::Lasso
+        } else {
+            Self::Rectangle(Aabb::new_positive(first.pos, last.pos))
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub(super) enum SelectorState {
     Idle,
@@ -317,6 +355,36 @@ impl DrawableOnDoc for Selector {
             SelectorState::Idle => {}
             SelectorState::Selecting { path } => {
                 match engine_view.config.pens_config.selector_config.style {
+                    SelectorStyle::Polygon
+                        if !matches!(
+                            SelectingShape::of_path(path, total_zoom),
+                            SelectingShape::Lasso
+                        ) =>
+                    {
+                        // Shown as the rectangle it selects until the path becomes a lasso.
+                        if let (Some(first), Some(last)) = (path.first(), path.last()) {
+                            let select_rect = kurbo::Rect::from_points(
+                                first.pos.to_kurbo_point(),
+                                last.pos.to_kurbo_point(),
+                            );
+
+                            let mut stroke_style = piet::StrokeStyle::new();
+                            stroke_style.set_dash_pattern(
+                                Self::SELECTING_DASH_PATTERN
+                                    .into_iter()
+                                    .map(|x| x / total_zoom)
+                                    .collect::<Vec<f64>>(),
+                            );
+
+                            cx.fill(select_rect, &Self::SELECTION_FILL_COLOR);
+                            cx.stroke_styled(
+                                select_rect,
+                                &Self::SELECTION_OUTLINE_COLOR,
+                                Self::OUTLINE_STROKE_WIDTH / total_zoom,
+                                &stroke_style,
+                            );
+                        }
+                    }
                     SelectorStyle::Polygon => {
                         let mut bez_path = kurbo::BezPath::new();
                         let mut path_iter = path.iter();

@@ -133,6 +133,7 @@ impl RnToolsPage {
                     .pens_config
                     .tools_config
                     .style = ToolStyle::VerticalSpace;
+                appwindow.sync_penpicker();
 
                 if let Some(canvas) = appwindow.active_tab_canvas() {
                     let widget_flags = canvas.engine_mut().reinstall_pen_current_style();
@@ -154,6 +155,7 @@ impl RnToolsPage {
                     .pens_config
                     .tools_config
                     .style = ToolStyle::OffsetCamera;
+                appwindow.sync_penpicker();
 
                 if let Some(canvas) = appwindow.active_tab_canvas() {
                     let widget_flags = canvas.engine_mut().reinstall_pen_current_style();
@@ -175,6 +177,7 @@ impl RnToolsPage {
                     .pens_config
                     .tools_config
                     .style = ToolStyle::Zoom;
+                appwindow.sync_penpicker();
 
                 if let Some(canvas) = appwindow.active_tab_canvas() {
                     let widget_flags = canvas.engine_mut().reinstall_pen_current_style();
@@ -196,6 +199,7 @@ impl RnToolsPage {
                     .pens_config
                     .tools_config
                     .style = ToolStyle::Laser;
+                appwindow.sync_penpicker();
 
                 if let Some(canvas) = appwindow.active_tab_canvas() {
                     let widget_flags = canvas.engine_mut().reinstall_pen_current_style();
