@@ -1,6 +1,6 @@
 ---
 
-id: com.github.flxzt.rnote.Devel
+id: io.github.ansgomez.tafel.Devel
 tags:
     - development
 runtime: org.gnome.Platform
@@ -8,7 +8,7 @@ runtime-version: "50"
 sdk: org.gnome.Sdk
 sdk-extensions:
     - org.freedesktop.Sdk.Extension.rust-stable
-command: rnote
+command: tafel
 finish-args:
     - "--socket=wayland"
     - "--socket=fallback-x11"
@@ -21,7 +21,7 @@ finish-args:
     - "--talk-name=org.gtk.vfs.*"
     - "--filesystem=xdg-run/gvfsd"
     - "--env=RUST_BACKTRACE=1"
-    - "--env=RUST_LOG=rnote=debug,rnote-cli=debug,rnote-engine=debug,rnote-compose=debug"
+    - "--env=RUST_LOG=tafel=debug,rnote-cli=debug,rnote-engine=debug,rnote-compose=debug"
     # - "--env=G_MESSAGES_DEBUG=all"
     - "--env=GTK_PATH=/app/lib/gtk-4.0"
 build-options:
@@ -32,7 +32,7 @@ build-options:
         - "--socket=x11"
         - "--share=network"
 modules:
-    - name: rnote
+    - name: tafel
       buildsystem: meson
       run-tests: true
       config-opts:

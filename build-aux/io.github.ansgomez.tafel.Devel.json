@@ -1,5 +1,5 @@
 {
-  "id": "com.github.flxzt.rnote.Devel",
+  "id": "io.github.ansgomez.tafel.Devel",
   "tags": [
     "development"
   ],
@@ -9,7 +9,7 @@
   "sdk-extensions": [
     "org.freedesktop.Sdk.Extension.rust-stable"
   ],
-  "command": "rnote",
+  "command": "tafel",
   "finish-args": [
     "--socket=wayland",
     "--socket=fallback-x11",
@@ -22,7 +22,7 @@
     "--talk-name=org.gtk.vfs.*",
     "--filesystem=xdg-run/gvfsd",
     "--env=RUST_BACKTRACE=1",
-    "--env=RUST_LOG=rnote=debug,rnote-cli=debug,rnote-engine=debug,rnote-compose=debug",
+    "--env=RUST_LOG=tafel=debug,rnote-cli=debug,rnote-engine=debug,rnote-compose=debug",
     "--env=GTK_PATH=/app/lib/gtk-4.0"
   ],
   "build-options": {
@@ -37,7 +37,7 @@
   },
   "modules": [
     {
-      "name": "rnote",
+      "name": "tafel",
       "buildsystem": "meson",
       "run-tests": true,
       "config-opts": [

@@ -5,11 +5,11 @@ Comment=Annotate PDF slides
 # Translators: Do NOT translate or transliterate this text, this is an icon file name!
 Icon=@APP_ID@
 #DBusActivatable=true
-Exec=@APP_NAME@ %f
+Exec=@APP_EXEC@ %f
 Terminal=false
 MimeType=application/rnote;image/svg+xml;image/png;image/jpeg;application/pdf;application/x-xopp;
 Type=Application
-Categories=GNOME;GTK;Graphics;
+Categories=GNOME;GTK;Education;
 # Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 Keywords=Gnome;GTK;Office;Graphics;Notes;PDF;Annotate;Slides;Lecture;
 StartupNotify=true
@@ -17,4 +17,4 @@ Actions=new-window
 
 [Desktop Action new-window]
 Name=New Window
-Exec=@APP_NAME@ %f
+Exec=@APP_EXEC@ %f

@@ -20,7 +20,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Console Output**  
-Run the app in the terminal with `flatpak --env=RUST_LOG=rnote=debug --env=RUST_BACKTRACE=1 run com.github.flxzt.rnote`
+Run the app in the terminal with `flatpak --env=RUST_LOG=tafel=debug --env=RUST_BACKTRACE=1 run io.github.ansgomez.tafel`
 and post the output.
 
 **Screenshots**  

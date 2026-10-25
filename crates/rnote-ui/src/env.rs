@@ -114,7 +114,7 @@ pub(crate) fn setup_env() -> anyhow::Result<()> {
             unsafe { _putenv_s(c"PANGOCAIRO_BACKEND".as_ptr(), c"fc".as_ptr()) };
         }
 
-        //unsafe { std::env::set_var("RUST_LOG", "rnote=debug,rnote-cli=debug,rnote-engine=debug,rnote-compose=debug") };
+        //unsafe { std::env::set_var("RUST_LOG", "tafel=debug,rnote-cli=debug,rnote-engine=debug,rnote-compose=debug") };
     } else if cfg!(target_os = "macos") {
         let canonicalized_exec_dir = exec_parent_dir()?.canonicalize()?;
 

@@ -9,6 +9,8 @@ endif
 desktop_conf = configuration_data()
 desktop_conf.set('APP_ID', app_id)
 desktop_conf.set('APP_NAME', app_name)
+# Absolute, because a user prefix such as ~/.local/bin is often not in the session PATH.
+desktop_conf.set('APP_EXEC', get_option('prefix') / get_option('bindir') / app_name)
 desktop_conf.set('DESKTOP_FILE_NAME_ENTRY', desktop_file_name_entry)
 desktop_file_in = configure_file(
     input: 'app.desktop.in.in',

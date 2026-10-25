@@ -159,13 +159,13 @@ build-flatpak:
         --repo={{ flatpak_repo_folder }} \
         --force-clean \
         {{ flatpak_app_folder}} \
-        build-aux/com.github.flxzt.rnote.Devel.yaml
+        build-aux/io.github.ansgomez.tafel.Devel.yaml
 
 build-flatpak-bundle:
     flatpak build-bundle \
         {{ flatpak_repo_folder }} \
-        com.github.flxzt.rnote.Devel.flatpak \
-        com.github.flxzt.rnote.Devel \
+        io.github.ansgomez.tafel.Devel.flatpak \
+        io.github.ansgomez.tafel.Devel \
         --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
 
 build-win-installer: build
@@ -176,7 +176,7 @@ install:
     meson install -C {{ build_folder }}
 
 install-flatpak:
-    flatpak-builder --user --install {{ flatpak_app_folder }} build-aux/com.github.flxzt.rnote.Devel.yaml
+    flatpak-builder --user --install {{ flatpak_app_folder }} build-aux/io.github.ansgomez.tafel.Devel.yaml
 
 run-ui *ARGS:
     {{ build_folder }}/target/debug/rnote {{ARGS}}
@@ -185,7 +185,7 @@ run-cli *ARGS:
     {{ build_folder }}/target/debug/rnote-cli {{ARGS}}
 
 run-flatpak:
-    flatpak-builder --run {{ flatpak_app_folder }} build-aux/com.github.flxzt.rnote.Devel.yaml rnote
+    flatpak-builder --run {{ flatpak_app_folder }} build-aux/io.github.ansgomez.tafel.Devel.yaml tafel
 
 test:
     meson test -C {{ build_folder }}
@@ -234,4 +234,4 @@ create-tarball *MESON_DIST_ARGS:
     meson dist {{ MESON_DIST_ARGS }} -C {{ build_folder }}
 
 generate-json-flatpak-manifest:
-    yq -o=json build-aux/com.github.flxzt.rnote.Devel.yaml > build-aux/com.github.flxzt.rnote.Devel.json
+    yq -o=json build-aux/io.github.ansgomez.tafel.Devel.yaml > build-aux/io.github.ansgomez.tafel.Devel.json
