@@ -540,4 +540,66 @@ mod tests {
         let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180"><rect x="0" y="0" width="320" height="180" fill="#fffffe"/><rect x="10" y="10" width="50" height="50" fill="#123456"/></svg>"##;
         assert_eq!(BlankPaper::of_stroke(&paper_stroke(svg)), None);
     }
+
+    /// Draw a stroke from `from` to `to` with the current pen.
+    fn draw_stroke(engine: &mut Engine, from: Vector2, to: Vector2, now: &mut Instant) {
+        use rnote_compose::penevent::PenEvent;
+        use rnote_compose::penpath::Element;
+
+        for i in 0..=10 {
+            *now += std::time::Duration::from_millis(8);
+            let pos = from + (to - from) * (i as f64 / 10.0);
+            let _ = engine.handle_pen_event(
+                PenEvent::Down {
+                    element: Element::new(pos, 0.5),
+                    modifier_keys: Default::default(),
+                },
+                None,
+                *now,
+            );
+        }
+        let _ = engine.handle_pen_event(
+            PenEvent::Up {
+                element: Element::new(to, 0.5),
+                modifier_keys: Default::default(),
+            },
+            None,
+            *now,
+        );
+    }
+
+    /// Drawing on the second page of an A4 document after undo and redo panicked in rstar, when
+    /// the rebuilt key tree was unbalanced.
+    #[test]
+    fn draw_on_second_page_after_undo_redo() {
+        for undo_interval in [3, 5, 7] {
+            let mut engine = Engine::default();
+            engine.document.config.layout = Layout::FixedSize;
+            let format_height = engine.document.config.format.height();
+            engine.document.height = 3.0 * format_height;
+            for page in 0..3 {
+                engine.insert_paper(page, BlankPaper::Plain);
+            }
+            let _ = engine.camera_set_size(Vector2::new(1200.0, 800.0));
+            let _ = engine.doc_go_to_page(1);
+            let _ = engine.change_pen_style(crate::pens::PenStyle::Brush);
+            let page = engine.document.single_page_bounds().unwrap();
+
+            let mut now = Instant::now();
+            for i in 0..150 {
+                // Strokes scattered over the page.
+                let from = page.mins
+                    + Vector2::new((i * 37 % 520) as f64 + 10.0, (i * 91 % 780) as f64 + 10.0);
+                draw_stroke(&mut engine, from, from + Vector2::new(30.0, 15.0), &mut now);
+                // Undo and redo rebuild the key tree, and the next strokes are inserted into it.
+                if i % undo_interval == 0 {
+                    let _ = engine.undo(now);
+                    assert!(engine.store.key_tree_is_balanced());
+                    let _ = engine.redo(now);
+                    assert!(engine.store.key_tree_is_balanced());
+                }
+            }
+            assert_eq!(engine.store.stroke_keys_unordered().len(), 3 + 150);
+        }
+    }
 }

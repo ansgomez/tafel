@@ -142,6 +142,12 @@ impl StrokeStore {
         widget_flags
     }
 
+    /// Whether the key tree is in a state that rstar can insert into.
+    #[cfg(test)]
+    pub(crate) fn key_tree_is_balanced(&self) -> bool {
+        self.key_tree.is_balanced()
+    }
+
     /// Rebuild the rtree with the current stored strokes keys and bounds.
     fn rebuild_rtree(&mut self) {
         let tree_objects = self
