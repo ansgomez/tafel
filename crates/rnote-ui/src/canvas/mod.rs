@@ -93,6 +93,7 @@ mod imp {
         pub(crate) text_input_enabled: Cell<bool>,
 
         pub(crate) last_export_dir: RefCell<Option<gio::File>>,
+        pub(crate) backup: RefCell<crate::backup::BackupState>,
     }
 
     impl Default for RnCanvas {
@@ -191,6 +192,7 @@ mod imp {
                 text_input_enabled: Cell::new(false),
 
                 last_export_dir: RefCell::new(None),
+                backup: RefCell::default(),
             }
         }
     }

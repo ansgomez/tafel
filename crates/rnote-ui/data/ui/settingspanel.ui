@@ -54,6 +54,12 @@
                       </object>
                     </child>
                     <child>
+                      <object class="AdwSwitchRow" id="general_backups_row">
+                        <property name="title" translatable="yes">Backup Files</property>
+                        <property name="subtitle" translatable="yes">Every two minutes, write unsaved changes to a backup file next to the document</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="AdwSwitchRow" id="general_show_scrollbars_row">
                         <property name="title" translatable="yes">Show Scrollbars</property>
                         <property name="subtitle" translatable="yes">Set whether the scrollbars on the canvas are shown</property>

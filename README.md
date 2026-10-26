@@ -42,6 +42,8 @@ as a native app for Linux pen tablets such as the Framework 12.
   them as "3 / 37 · blank 1/2".
 - **Your PDF stays untouched.** Notes are saved as `.rnote` files and exported as an
   annotated PDF.
+- **Backup files.** Unsaved changes are written to a backup file next to the document,
+  see [Backups](#backups).
 - **Rnote compatible.** Tafel reads and writes the Rnote file format, so the notes also open in
   Rnote.
 
@@ -100,6 +102,26 @@ uses the upstream Rnote names.
 | Undo / redo | Toolbar, Ctrl+Z / Ctrl+Shift+Z |
 | Move the toolbar to another edge | First toolbar button |
 | Zoom | Pinch; the next page turn fits the page again |
+
+## Backups
+
+While a document has unsaved changes, Tafel writes a backup every two minutes to
+`<name>.backup.rnote` in the same folder as the edited file. For a PDF that was never saved
+as `.rnote`, the backup goes next to the PDF (`slides.pdf` gives `slides.backup.rnote`).
+A new document that has no file yet gets no backup.
+
+- Saving the document, or closing it, deletes the backup.
+- When you open a file and a backup with different content exists (for example after a
+  crash), Tafel asks whether to restore it. **Restore** loads the backup as unsaved changes,
+  so save to keep them. **Discard** deletes the backup. If the backup matches the file, it is
+  deleted silently. Closing the dialog without a choice keeps the backup until the document
+  is saved or closed.
+- You can also open a `.backup.rnote` file directly, like any other document.
+- Turn backups off in Preferences, *Backup Files*
+  (`gsettings set io.github.ansgomez.tafel backups false`).
+
+Backups complement Rnote's autosave, which only rewrites documents that already have a
+`.rnote` file.
 
 ## Roadmap
 

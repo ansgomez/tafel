@@ -46,6 +46,16 @@ impl RnAppWindow {
             .get_no_changes()
             .build();
 
+        // backups
+        app_settings
+            .bind(
+                "backups",
+                &self.sidebar().settings_panel().general_backups_row(),
+                "active",
+            )
+            .get_no_changes()
+            .build();
+
         // righthanded
         app_settings
             .bind("righthanded", self, "righthanded")

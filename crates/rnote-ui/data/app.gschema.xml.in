@@ -129,6 +129,10 @@
       <default>120</default>
       <summary>the sec interval for the autosave</summary>
     </key>
+    <key name="backups" type="b">
+      <default>true</default>
+      <summary>true when backup files are written next to the edited file</summary>
+    </key>
     <key name="show-scrollbars" type="b">
       <default>false</default>
       <summary>Whether the canvas scrollbars are shown</summary>

@@ -236,6 +236,8 @@ impl RnCanvas {
             .engine_ref()
             .save_as_rnote_bytes(basename.to_string_lossy().to_string());
 
+        let prev_backup_file = self.backup_file();
+
         let mut skip_set_output_file = false;
         if let Some(output_filepath) = self.output_file().and_then(|f| f.path())
             && crate::utils::paths_abs_eq(output_filepath, &filepath).unwrap_or(false)
@@ -271,6 +273,13 @@ impl RnCanvas {
         }
         self.set_unsaved_changes(false);
         self.set_save_in_progress(false);
+
+        // The saved file holds everything now, the backup is not needed anymore.
+        let backup_file = self.backup_file();
+        if backup_file != prev_backup_file {
+            self.discard_backup(prev_backup_file);
+        }
+        self.discard_backup(backup_file);
 
         Ok(true)
     }
