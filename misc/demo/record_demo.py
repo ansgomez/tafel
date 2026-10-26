@@ -37,7 +37,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 REPO = Path(__file__).resolve().parents[2]
-WIDTH, HEIGHT = 1280, 800
+# 1440 px is wide enough to keep every toolbar on one line (at 1370 px they wrap onto two lines).
+WIDTH, HEIGHT = 1440, 800
 BROADWAY_DISPLAY = 7
 BROADWAY_PORT = 8080 + BROADWAY_DISPLAY
 MARIONETTE_PORT = 28287
@@ -281,10 +282,10 @@ def demo_script(browser, rec):
     def slide(points):
         return [(left + x * scale, top + y * scale) for x, y in points]
 
-    # Toolbar buttons, in viewport pixels for the 1280 px wide window.
-    # Measured from a screenshot; update them if the toolbar layout changes.
-    pen, red, blue, size_m = (394, 70), (698, 70), (735, 70), (1000, 70)
-    next_page = (1244, 91)
+    # Toolbar buttons, in viewport pixels for the 1440 px wide window.
+    # Measured from a screenshot; update them if the toolbar layout or WIDTH changes.
+    pen, red, blue, size_m = (134, 76), (438, 76), (475, 76), (740, 76)
+    next_page = (1404, 76)
 
     # Highlight the second bullet.
     # The highlighter is left out: Broadway cannot render its blend mode and shows magenta.
@@ -326,7 +327,7 @@ def handwritten_8v(x, y):
 def page_bbox(image):
     """Bounding box of the white page in a screenshot."""
     mask = image.convert("L").point(lambda v: 255 if v > 250 else 0)
-    mask.paste(0, (0, 0, image.width, 140))  # ignore the toolbar (it has a white color button)
+    mask.paste(0, (0, 0, image.width, 110))  # ignore the toolbar (it has a white color button)
     return mask.getbbox()
 
 
@@ -360,7 +361,8 @@ def click_import_button(browser):
     """Click the blue (suggested action) Import button in the header of the PDF import dialog."""
     for _ in range(20):
         shot = browser.screenshot()
-        pos = find_color(shot.crop((0, 0, shot.width, 60)), (53, 132, 228), tolerance=25)
+        # Where the dialog header sits depends on the window size, so search the top 140 px.
+        pos = find_color(shot.crop((0, 0, shot.width, 140)), (53, 132, 228), tolerance=25, min_pixels=1000)
         if pos:
             click(browser, *pos)
             return
@@ -370,7 +372,7 @@ def click_import_button(browser):
 
 def save_webp(frames, durations, out):
     out.parent.mkdir(parents=True, exist_ok=True)
-    width = 960
+    width = WIDTH * 3 // 4  # keeps the UI text readable at a moderate file size
     size = (width, round(frames[0].height * width / frames[0].width))
     small = [f.resize(size, Image.LANCZOS) for f in frames]
     small[0].save(
