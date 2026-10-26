@@ -1,10 +1,14 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Suggest an idea for Tafel
 title: ''
 labels: ''
 assignees: ''
 ---
+
+**Note:** Tafel is in maintenance mode and gets bug fixes only, so new features are unlikely to
+be implemented. Requests for Rnote's drawing features belong in the
+[Rnote issue tracker](https://github.com/flxzt/rnote/issues).
 
 **Please submit only one feature request in one issue!**  
 If it is UI/UX related, don't post how a single aspect of the UI should be changed, rather in which use-case you felt
