@@ -282,6 +282,7 @@ impl RnAppWindow {
             if let Err(e) = self.setup_periodic_save() {
                 error!("Failed to setup periodic save, Err: {e:?}");
             }
+            self.setup_backups();
             if let Err(e) = self.load_settings() {
                 error!("Failed to load initial settings, Err: {e:?}");
             }
@@ -320,6 +321,8 @@ impl RnAppWindow {
             .map(|p| p.child().downcast::<RnCanvasWrapper>().unwrap())
         {
             let _ = tab.canvas().engine_mut().set_active(false);
+            // Clean close: the backup is not needed anymore.
+            tab.canvas().discard_backup(tab.canvas().backup_file());
             tab.canvas()
                 .engine_ref()
                 .engine_tasks_tx()
@@ -345,6 +348,7 @@ impl RnAppWindow {
         if widget_flags.store_modified {
             canvas.set_unsaved_changes(true);
             canvas.set_empty(false);
+            canvas.set_backup_pending(true);
         }
         if widget_flags.view_modified {
             canvas.queue_allocate();
@@ -586,6 +590,14 @@ impl RnAppWindow {
     ///
     /// Closes the given tab when confirm is true, else reverts so that close_tab_request() can be called again.
     pub(crate) fn close_tab_finish(&self, tab_page: &adw::TabPage, confirm: bool) {
+        if confirm {
+            let canvas = tab_page
+                .child()
+                .downcast::<RnCanvasWrapper>()
+                .unwrap()
+                .canvas();
+            canvas.discard_backup(canvas.backup_file());
+        }
         self.overlays()
             .tabview()
             .close_page_finish(tab_page, confirm);
@@ -695,6 +707,7 @@ impl RnAppWindow {
                         self.append_wrapper_new_tab(&wrapper);
                     }
                     self.handle_widget_flags(widget_flags, &wrapper.canvas());
+                    self.offer_backup_restore(&wrapper.canvas()).await;
                     true
                 }
             }
@@ -732,6 +745,7 @@ impl RnAppWindow {
                 file_imported
             }
             FileType::PdfFile => {
+                let input_path = input_file.path();
                 // A Pdf becomes the pages of its document, so it goes into the current tab only
                 // when that is still empty, and into a new tab otherwise.
                 let (new_tab, wrapper) = match self.active_tab_wrapper() {
@@ -751,6 +765,13 @@ impl RnAppWindow {
                 .await?;
                 if file_imported && new_tab {
                     self.append_wrapper_new_tab(&wrapper);
+                }
+                if file_imported {
+                    // Back up next to the PDF until the document is saved. The import itself is no change.
+                    let canvas = wrapper.canvas();
+                    canvas.set_backup_source_pdf(input_path);
+                    canvas.set_backup_pending(false);
+                    self.offer_backup_restore(&canvas).await;
                 }
                 file_imported
             }

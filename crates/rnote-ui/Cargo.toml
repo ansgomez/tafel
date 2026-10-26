@@ -67,3 +67,6 @@ glib-build-tools = { workspace = true }
 
 [target.'cfg(windows)'.build-dependencies]
 winresource = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

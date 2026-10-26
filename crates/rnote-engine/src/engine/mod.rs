@@ -342,6 +342,11 @@ impl Engine {
         }
     }
 
+    /// Whether the document holds no strokes (trashed strokes do not count).
+    pub fn has_no_strokes(&self) -> bool {
+        self.store.stroke_keys_unordered().is_empty()
+    }
+
     /// Imports an engine snapshot. A save file should always be loaded with this method.
     pub fn load_snapshot(&mut self, snapshot: EngineSnapshot) -> WidgetFlags {
         self.document = snapshot.document.extract_snapshot_data();
