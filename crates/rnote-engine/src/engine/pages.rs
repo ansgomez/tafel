@@ -111,9 +111,9 @@ impl BlankPaper {
         });
         if !svg.contains(Self::BASE_COLOR) || !only_paper {
             None
-        } else if image.svg_data.contains(Self::RULE_COLOR) {
+        } else if svg.contains(Self::RULE_COLOR) {
             Some(Self::Lined)
-        } else if image.svg_data.contains(Self::GRID_COLOR) {
+        } else if svg.contains(Self::GRID_COLOR) {
             Some(Self::Grid)
         } else {
             Some(Self::Plain)
@@ -369,7 +369,7 @@ impl Engine {
         page >= 0 && page < self.doc_n_pages() as i64
     }
 
-    /// Scroll `delta` pages forward (or backward when negative) from the current page.
+    /// Show the page `delta` pages forward (or backward when negative) from the current page.
     pub fn doc_go_to_page_relative(&mut self, delta: i32) -> WidgetFlags {
         let page = (self.doc_current_page() as i64 + delta as i64).max(0) as u32;
         self.doc_go_to_page(page)
@@ -400,7 +400,7 @@ impl Engine {
     }
 
     /// Insert a blank page with the given paper after the current page when in fixed size layout,
-    /// moving all following content down by one page, and scroll to it.
+    /// moving all following content down by one page, and show it.
     pub fn doc_insert_page_after_current(&mut self, paper: BlankPaper) -> WidgetFlags {
         let mut widget_flags = WidgetFlags::default();
         let Some(format_height) = self.format_height() else {

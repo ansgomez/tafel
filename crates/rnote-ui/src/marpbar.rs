@@ -168,7 +168,7 @@ const REFERENCE_WIDTH: f64 = 1280.0;
 const COLORS: [(&str, &str); 8] = [
     ("Black", "#000000"),
     ("White", "#ffffff"),
-    ("TU Braunschweig red", "#be1e3c"),
+    ("Red", "#be1e3c"),
     ("Blue", "#1e64c8"),
     ("Green", "#2e8b3a"),
     ("Orange", "#f08c00"),
@@ -238,6 +238,11 @@ fn icon_texture(paths: &str, size: i32) -> Option<gdk::Texture> {
     gdk::Texture::from_bytes(&glib::Bytes::from_owned(svg.into_bytes()))
         .inspect_err(|e| tracing::error!("Loading toolbar icon failed, Err: {e:?}"))
         .ok()
+}
+
+/// Activate an action of the app window, as the corresponding menu entry or shortcut would.
+fn activate_win_action(appwindow: &RnAppWindow, name: &str) {
+    gtk4::gio::prelude::ActionGroupExt::activate_action(appwindow, name, None);
 }
 
 fn icon_image(paths: &str, size: i32) -> Image {
@@ -385,7 +390,7 @@ fn bar_css() -> String {
     for (i, px) in SIZE_DOTS.iter().enumerate() {
         css.push_str(&format!(
             ".marp-size-{i} {{ min-width: {px}px; min-height: {px}px; border-radius: {}px; }}\n",
-            (px + 1) / 2
+            px.div_ceil(2)
         ));
     }
     css
@@ -489,7 +494,7 @@ impl RnMarpBar {
             );
         }
 
-        // Mode
+        // Dock position
         let dock = self.add_item(appwindow, None, ItemKind::Dock, "Move toolbar", None);
         let dock_image = icon_image(ICON_DOCK_TOP, 22);
         dock.set_child(Some(&dock_image));
@@ -678,9 +683,6 @@ impl RnMarpBar {
     fn take_last_into(&self, edge: &Grid, button: &Button) {
         self.current_group().remove(button);
         edge.attach(button, 0, 0, 1, 1);
-        if let Some(image) = button.child().and_downcast::<Image>() {
-            image.set_pixel_size(34);
-        }
     }
 
     fn add_item(
@@ -695,10 +697,11 @@ impl RnMarpBar {
         button.add_css_class("marp-btn");
         button.set_tooltip_text(Some(tooltip));
         button.set_focus_on_click(false);
-        // An icon with a small caption underneath (the two erasers).
+        // The previous / next page buttons at the bar ends get larger icons.
         let edge = matches!(kind, ItemKind::PagePrev | ItemKind::PageNext);
         if let Some(icon) = icon {
             match caption {
+                // An icon with a small caption underneath (the two erasers).
                 Some(caption) => {
                     let content = gtk4::Box::new(Orientation::Vertical, 1);
                     content.set_valign(Align::Center);
@@ -868,37 +871,23 @@ impl RnMarpBar {
                 }
             }
             ItemKind::Undo => {
-                let _ =
-                    gtk4::gio::prelude::ActionGroupExt::activate_action(appwindow, "undo", None);
+                activate_win_action(appwindow, "undo");
             }
             ItemKind::Redo => {
-                let _ =
-                    gtk4::gio::prelude::ActionGroupExt::activate_action(appwindow, "redo", None);
+                activate_win_action(appwindow, "redo");
             }
             ItemKind::Clear => {
                 let widget_flags = canvas.engine_mut().doc_clear_current_page();
                 appwindow.handle_widget_flags(widget_flags, &canvas);
             }
             ItemKind::PagePrev => {
-                let _ = gtk4::gio::prelude::ActionGroupExt::activate_action(
-                    appwindow,
-                    "page-prev",
-                    None,
-                );
+                activate_win_action(appwindow, "page-prev");
             }
             ItemKind::PageNext => {
-                let _ = gtk4::gio::prelude::ActionGroupExt::activate_action(
-                    appwindow,
-                    "page-next",
-                    None,
-                );
+                activate_win_action(appwindow, "page-next");
             }
             ItemKind::PageInsert => {
-                let _ = gtk4::gio::prelude::ActionGroupExt::activate_action(
-                    appwindow,
-                    "page-insert-after",
-                    None,
-                );
+                activate_win_action(appwindow, "page-insert-after");
             }
             ItemKind::Paper(paper) => {
                 self.imp().paper.set(paper);
@@ -906,28 +895,16 @@ impl RnMarpBar {
                 appwindow.handle_widget_flags(widget_flags, &canvas);
             }
             ItemKind::PageDelete => {
-                let _ = gtk4::gio::prelude::ActionGroupExt::activate_action(
-                    appwindow,
-                    "page-delete",
-                    None,
-                );
+                activate_win_action(appwindow, "page-delete");
             }
             ItemKind::Save => {
-                let _ = gtk4::gio::prelude::ActionGroupExt::activate_action(
-                    appwindow, "save-doc", None,
-                );
+                activate_win_action(appwindow, "save-doc");
             }
             ItemKind::Open => {
-                let _ = gtk4::gio::prelude::ActionGroupExt::activate_action(
-                    appwindow, "open-doc", None,
-                );
+                activate_win_action(appwindow, "open-doc");
             }
             ItemKind::Pdf => {
-                let _ = gtk4::gio::prelude::ActionGroupExt::activate_action(
-                    appwindow,
-                    "export-doc",
-                    None,
-                );
+                activate_win_action(appwindow, "export-doc");
             }
         }
         self.refresh(appwindow);

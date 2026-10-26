@@ -1,3 +1,7 @@
+> **Note:** This file is Rnote's maintenance guide, kept for reference. Tafel does not publish releases,
+> Flatpaks or installers, and it does not use Weblate. To merge upstream changes, see "Keeping up with upstream"
+> in [BUILDING.md](BUILDING.md).
+
 # Manual Maintenance Jobs
 
 Every once in a while, make sure to:

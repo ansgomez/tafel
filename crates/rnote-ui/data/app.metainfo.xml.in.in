@@ -6,7 +6,7 @@
   <project_license>GPL-3.0-or-later</project_license>
   <name translatable="no">@APP_NAME_CAPITALIZED@</name>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
-  <summary>Annotate PDF slides like MarpX</summary>
+  <summary>Annotate PDF slides with a pen</summary>
 
   <categories>
     <category>Graphics</category>
@@ -42,7 +42,6 @@
   <url type="donation">@APP_DONATE_URL@</url>
   <url type="vcs-browser">@APP_REPO_URL@</url>
   <developer_name translatable="no">@APP_AUTHOR_NAME@</developer_name>
-  <update_contact>f.zwettler@posteo.de</update_contact>
   <content_rating type="oars-1.0" />
 
   <provides>

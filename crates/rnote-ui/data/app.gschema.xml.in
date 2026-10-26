@@ -51,7 +51,7 @@
     </key>
     <key name="colorpicker-color-3" type="(dddd)">
       <default>(0.745, 0.118, 0.235, 1.0)</default>
-      <summary>the colorpicker palette color 3 (default: TU Braunschweig red)</summary>
+      <summary>the colorpicker palette color 3 (default: red)</summary>
     </key>
     <key name="colorpicker-color-4" type="(dddd)">
       <default>(0.118, 0.392, 0.784, 1.0)</default>

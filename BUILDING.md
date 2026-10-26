@@ -45,7 +45,7 @@ sudo apt install \
     shared-mime-info libgtk-4-dev libadwaita-1-dev libasound2-dev libappstream-dev
 ```
 
-Install Rust with [rustup](https://rustup.rs/).
+Install Rust either from your distribution (`sudo dnf install rust cargo` on Fedora) or with [rustup](https://rustup.rs/).
 The minimum Rust version is set by `rust-version` in the root `Cargo.toml` (currently 1.89).
 
 ## Set up, compile and install
@@ -181,14 +181,31 @@ Open the repository as a workspace and pick "debug ui" in the "Run and Debug" pa
 
 # Flatpak, Windows, just recipes and nightlies
 
-These paths still use upstream Rnote names and are **not adapted or tested for Tafel**:
+These build paths are inherited from Rnote and are **not tested for Tafel**:
 
-- Flatpak manifests: `build-aux/com.github.flxzt.rnote.Devel.json` and `.yaml`
+- Flatpak manifests: `build-aux/io.github.ansgomez.tafel.Devel.json` and `.yaml` (renamed, but never built)
 - Windows installer: Inno Setup script `build-aux/rnote_inno.iss.in`, built with MSYS2 (`build-installer` target)
-- The `justfile` and the nightly CI workflow
+- macOS: [docs/build-macos.md](docs/build-macos.md); Windows: [docs/build-win.md](docs/build-win.md) (upstream instructions)
+- The `justfile` and the CI workflows in `.github/workflows`
 
-They need renaming (app ID, binary name, resource paths) before they work for Tafel.
-Until then, see upstream's [BUILDING.md](https://github.com/flxzt/rnote/blob/main/BUILDING.md) for how they work.
+Tafel only supports Linux. See upstream's [BUILDING.md](https://github.com/flxzt/rnote/blob/main/BUILDING.md) for how these paths work in Rnote.
+
+# Recording the README demo
+
+`misc/media/tafel-demo.webp` is recorded by a script, without touching your desktop session.
+The script runs Tafel on GTK's Broadway backend (`gtk4-broadwayd`), opens the result in a headless Firefox
+with a throwaway profile, draws on a generated sample slide through Firefox's Marionette protocol and saves
+the screenshots as an animated WebP. Settings and all XDG directories point into a temporary directory.
+
+Requirements: `gtk4-broadwayd` (from `gtk4`), `firefox`, and `python3` with `pycairo` and `Pillow`
+(`sudo dnf install python3-cairo python3-pillow`). Build Tafel first, then run from the repository root:
+
+```bash
+python3 misc/demo/record_demo.py
+```
+
+The toolbar button positions in `misc/demo/record_demo.py` are measured for a 1280 px wide window.
+Update them if the toolbar layout changes.
 
 # Keeping up with upstream
 

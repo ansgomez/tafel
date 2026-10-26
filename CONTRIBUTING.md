@@ -1,3 +1,19 @@
+# Contributing to Tafel
+
+Tafel is a fork of [Rnote](https://github.com/flxzt/rnote) in maintenance mode: it gets bug fixes only.
+
+- **Bugs:** open an issue at <https://github.com/ansgomez/tafel/issues> with the bug report template.
+- **Pull requests:** small bug fixes are welcome. Keep changes to upstream code minimal, so that
+  upstream changes can still be merged. Run `cargo fmt`, `cargo clippy` and `cargo test` before opening a PR.
+- **Bugs that also happen in Rnote** are best fixed upstream first. Tafel picks up the fix by merging upstream.
+- **Translations** come from Rnote's [Weblate project](https://hosted.weblate.org/projects/rnote/repo/).
+  Strings that exist only in Tafel are not translated yet.
+
+The rest of this file is Rnote's contributing guide, kept for reference. It describes how to contribute to Rnote
+itself; its maintainers and processes are not Tafel's.
+
+---
+
 # Contributing to Rnote
 
 This document provides a guideline how to contribute to Rnote.
