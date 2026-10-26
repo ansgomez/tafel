@@ -188,7 +188,7 @@
         <child>
           <object class="GtkButton">
             <property name="icon_name">remove-page-symbolic</property>
-            <property name="tooltip_text" translatable="yes">Delete This Page (only when empty)</property>
+            <property name="tooltip_text" translatable="yes">Delete This Page (blank pages only)</property>
             <property name="action-name">win.page-delete</property>
             <style>
               <class name="flat" />

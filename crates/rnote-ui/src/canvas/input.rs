@@ -364,7 +364,7 @@ fn retrieve_pointer_elements(
     let mut elements = Vec::with_capacity(1);
 
     // Transforms the pos given in surface coordinate space to the canvas document coordinate space
-    // Returns `None` when the position can not be transformed, panicking here would abort the app.
+    // Returns `None` when the position cannot be transformed (panicking here would abort the app).
     let transform_pos = |pos: Vector2| -> Option<Vector2> {
         event_native
             .compute_point(

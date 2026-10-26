@@ -732,7 +732,7 @@ impl RnAppWindow {
                 file_imported
             }
             FileType::PdfFile => {
-                // A Pdf becomes the pages of its document, so it goes into the current tab only
+                // A PDF becomes the pages of its document, so it goes into the current tab only
                 // when that is still empty, and into a new tab otherwise.
                 let (new_tab, wrapper) = match self.active_tab_wrapper() {
                     Some(wrapper)

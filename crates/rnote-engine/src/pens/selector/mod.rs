@@ -869,7 +869,7 @@ impl Selector {
     }
 
     fn select_all(&mut self, engine_view: &mut EngineViewMut, widget_flags: &mut WidgetFlags) {
-        // Select all keys, only those on the shown page when a single page is shown
+        // Select all strokes, or only those on the shown page when a single page is shown.
         let all_strokes = match engine_view.document.single_page_bounds() {
             Some(page) => engine_view
                 .store

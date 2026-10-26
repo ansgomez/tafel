@@ -109,7 +109,7 @@ impl Document {
 
     /// The bounds of what is shown: the shown page in the fixed size layout, otherwise the
     /// whole document.
-    #[allow(unused)]
+    #[cfg_attr(not(feature = "ui"), allow(unused))]
     pub(crate) fn view_bounds(&self) -> Aabb {
         self.single_page_bounds().unwrap_or_else(|| self.bounds())
     }

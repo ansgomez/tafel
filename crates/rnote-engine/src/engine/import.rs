@@ -106,7 +106,7 @@ impl Default for PdfImportPrefs {
             page_width_perc: 100.0,
             page_spacing: PdfImportPageSpacing::default(),
             bitmap_scalefactor: 1.8,
-            // Annotating a Pdf: its pages become the document pages.
+            // Annotating a PDF: its pages become the document pages.
             adjust_document: true,
         }
     }
