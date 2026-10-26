@@ -179,7 +179,7 @@ install-flatpak:
     flatpak-builder --user --install {{ flatpak_app_folder }} build-aux/io.github.ansgomez.tafel.Devel.yaml
 
 run-ui *ARGS:
-    {{ build_folder }}/target/debug/rnote {{ARGS}}
+    {{ build_folder }}/target/debug/tafel {{ARGS}}
 
 run-cli *ARGS:
     {{ build_folder }}/target/debug/rnote-cli {{ARGS}}

@@ -6,12 +6,12 @@
             "env": {
                 "LANG": "C",
                 "RUST_BACKTRACE": "1",
-                "RUST_LOG": "rnote=debug,rnote-cli=debug,rnote-engine=debug,rnote-compose=debug"
+                "RUST_LOG": "tafel=debug,rnote-cli=debug,rnote-engine=debug,rnote-compose=debug"
                 //"G_MESSAGES_DEBUG": "all",
             },
             "name": "debug ui",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/_mesonbuild/rnote",
+            "program": "${workspaceFolder}/_mesonbuild/tafel",
             "request": "launch",
             "type": "lldb"
         },
