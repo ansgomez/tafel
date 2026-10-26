@@ -241,7 +241,9 @@ impl DrawableOnDoc for LaserTool {
             }
 
             // The dot at the head, with a soft glow around it.
-            let head = points.last().unwrap().to_kurbo_point();
+            let Some(head) = points.last().map(|head| head.to_kurbo_point()) else {
+                continue;
+            };
             cx.fill(
                 kurbo::Circle::new(head, Self::GLOW_RADIUS / total_zoom),
                 &Self::COLOR.with_alpha(0.15 * opacity),

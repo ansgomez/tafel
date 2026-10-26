@@ -48,13 +48,22 @@ impl Element {
     pub fn new(pos: Vector2, pressure: f64) -> Self {
         Self {
             pos,
-            pressure: pressure.clamp(0.0, 1.0),
+            pressure: Self::clamp_pressure(pressure),
         }
     }
 
     /// Sets the pressure, clamped to the range [0.0 - 1.0].
     pub fn set_pressure_clamped(&mut self, pressure: f64) {
-        self.pressure = pressure.clamp(0.0, 1.0);
+        self.pressure = Self::clamp_pressure(pressure);
+    }
+
+    /// Clamps the pressure to the range [0.0 - 1.0], a NaN pressure becomes the default.
+    fn clamp_pressure(pressure: f64) -> f64 {
+        if pressure.is_nan() {
+            Self::PRESSURE_DEFAULT
+        } else {
+            pressure.clamp(0.0, 1.0)
+        }
     }
 
     /// Indicates if a element is out of valid bounds and should be filtered out.
@@ -67,5 +76,20 @@ impl Element {
     /// Transforms the element position by the given transform.
     pub fn transform_by(&mut self, transform: DAffine2) {
         self.pos = transform.transform_point2(self.pos);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn nan_pressure_becomes_default() {
+        let mut element = Element::new(Vector2::ZERO, f64::NAN);
+        assert_eq!(element.pressure, Element::PRESSURE_DEFAULT);
+        element.set_pressure_clamped(f64::NAN);
+        assert_eq!(element.pressure, Element::PRESSURE_DEFAULT);
+        assert_eq!(Element::new(Vector2::ZERO, 2.0).pressure, 1.0);
+        assert_eq!(Element::new(Vector2::ZERO, f64::NEG_INFINITY).pressure, 0.0);
     }
 }

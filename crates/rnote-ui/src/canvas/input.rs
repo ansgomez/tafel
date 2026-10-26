@@ -364,7 +364,8 @@ fn retrieve_pointer_elements(
     let mut elements = Vec::with_capacity(1);
 
     // Transforms the pos given in surface coordinate space to the canvas document coordinate space
-    let transform_pos = |pos: Vector2| -> Vector2 {
+    // Returns `None` when the position can not be transformed, panicking here would abort the app.
+    let transform_pos = |pos: Vector2| -> Option<Vector2> {
         event_native
             .compute_point(
                 canvas,
@@ -380,7 +381,7 @@ fn retrieve_pointer_elements(
                     .inverse()
                     .transform_point2(p.to_p2d_vec())
             })
-            .unwrap()
+            .filter(|pos| pos.is_finite())
     };
 
     if event.event_type() == gdk::EventType::MotionNotify
@@ -413,10 +414,12 @@ fn retrieve_pointer_elements(
             prev_delta = entry_delta;
 
             let axes = entry.axes();
-            let pos = transform_pos(Vector2::new(
+            let Some(pos) = transform_pos(Vector2::new(
                 axes[crate::utils::axis_use_idx(gdk::AxisUse::X)],
                 axes[crate::utils::axis_use_idx(gdk::AxisUse::Y)],
-            ));
+            )) else {
+                continue;
+            };
             let pressure = if is_stylus {
                 axes[crate::utils::axis_use_idx(gdk::AxisUse::Pressure)]
             } else {
@@ -431,10 +434,12 @@ fn retrieve_pointer_elements(
 
     let pos = event
         .position()
-        .map(|(x, y)| transform_pos(Vector2::new(x, y)))?;
+        .and_then(|(x, y)| transform_pos(Vector2::new(x, y)))?;
 
     let pressure = if is_stylus {
-        event.axis(gdk::AxisUse::Pressure).unwrap()
+        event
+            .axis(gdk::AxisUse::Pressure)
+            .unwrap_or(Element::PRESSURE_DEFAULT)
     } else {
         Element::PRESSURE_DEFAULT
     };
